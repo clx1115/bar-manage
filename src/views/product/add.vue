@@ -66,7 +66,7 @@ const onChangeImg = (val: string) => {
 const onSubmit = () => {
   const infoData = infoRef.value.transmit()
   const attrData = attrRef.value.transmit()
-  const parameData = parameRef.value.transmit()
+  // const parameData = parameRef.value.transmit()
   const groupData = Object.assign(infoData, attrData)
   const formData = JSON.parse(JSON.stringify(groupData))
   let sku = {
