@@ -67,7 +67,6 @@ const getDetailData = () => {
       id: res.id,
       categoryId: res.categoryId,
       activityCategoryId: res.activityCategoryId,
-      barcode: res.barcode,
       name: res.name,
       unit: res.unit,
       oldPrice: res.oldPrice / 100,
@@ -227,7 +226,7 @@ const onSubmit = () => {
         type: 'error',
       })
     }
-    if (!formData.coverImgUrl) {
+    /* if (!formData.coverImgUrl) {
       return ElMessage({
         message: '请上传商品主图',
         type: 'error',
@@ -244,7 +243,7 @@ const onSubmit = () => {
         message: '请上传商品详情',
         type: 'error',
       })
-    }
+    } */
     if (!sku.skuList.length) {
       return ElMessage({
         message: '请至少生成一条商品规格',

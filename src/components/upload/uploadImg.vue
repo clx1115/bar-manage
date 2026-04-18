@@ -1,5 +1,5 @@
 <template>
-  <el-upload class="upload-box" action="/v2/shop/upload/" :headers="headers" :style="{ width: width + 'px', height: height + 'px' }" accept=".jpg,.jpeg,.png,.gif" :show-file-list="false" :multiple="false" :on-success="handleSuccess" :before-upload="beforeUpload">
+  <el-upload class="upload-box" action="/v1/shop/upload/" :headers="headers" :style="{ width: width + 'px', height: height + 'px' }" accept=".jpg,.jpeg,.png,.gif" :show-file-list="false" :multiple="false" :on-success="handleSuccess" :before-upload="beforeUpload">
     <div v-if="imageUrl" class="image-box" :style="{ width: width + 'px', height: height + 'px' }">
       <img :src="imageUrl" class="image" />
       <div class="shadow" @click.stop="onRemoveHandler">

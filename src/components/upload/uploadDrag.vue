@@ -10,7 +10,7 @@
         </div>
       </template>
     </draggable>
-    <el-upload class="upload-box" :headers="headers" action="/v2/shop/upload/" :style="{ width: width + 'px', height: height + 'px' }" accept=".jpg,.jpeg,.png,.gif" :show-file-list="false" :multiple="true" :limit="limit" :on-success="handleSuccess" :before-upload="beforeUpload">
+    <el-upload class="upload-box" :headers="headers" action="/v1/shop/upload/" :style="{ width: width + 'px', height: height + 'px' }" accept=".jpg,.jpeg,.png,.gif" :show-file-list="false" :multiple="true" :limit="limit" :on-success="handleSuccess" :before-upload="beforeUpload">
       <div class="plus" :style="{ width: width + 'px', height: height + 'px' }">
         <SvgIcon name="ele-Plus" />
       </div>

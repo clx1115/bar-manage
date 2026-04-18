@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getTemplateList(params?: object) {
   return request({
-    url: '/v2/shop/sku_template/',
+    url: '/v1/shop/sku_template/',
     method: 'get',
     params: params,
   })
@@ -16,7 +16,7 @@ export function getTemplateList(params?: object) {
  */
 export function addTemplate(data: object) {
   return request({
-    url: '/v2/shop/sku_template/new/',
+    url: '/v1/shop/sku_template/new/',
     method: 'post',
     data,
   })
@@ -27,7 +27,7 @@ export function addTemplate(data: object) {
  */
 export function updateTemplate(data: any) {
   return request({
-    url: `/v2/shop/sku_template/${data.id}/`,
+    url: `/v1/shop/sku_template/${data.id}/`,
     method: 'post',
     data,
   })
@@ -36,7 +36,7 @@ export function updateTemplate(data: any) {
 //删除规格模板
 export function delTemplate(data: any) {
   return request({
-    url: '/v2/shop/sku_template/',
+    url: '/v1/shop/sku_template/',
     method: 'post',
     data: {
       id: data.id,

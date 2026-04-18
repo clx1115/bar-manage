@@ -11,11 +11,7 @@
           <el-cascader v-model="formData.activityCategoryId" :options="activitCategoryList" collapse-tags clearable :props="{ value: 'id', label: 'name', multiple: false, emitPath: false }" />
         </el-form-item>
       </el-col> -->
-      <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
-        <el-form-item label="条形码" prop="barcode">
-          <el-input v-model="formData.barcode" placeholder="请输入条形码" clearable></el-input>
-        </el-form-item>
-      </el-col>
+
       <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
         <el-form-item label="商品名称" prop="name">
           <el-input v-model="formData.name" placeholder="请输入商品名称" clearable></el-input>
@@ -134,7 +130,6 @@ const state = reactive({
   categoryList: [],
   formData: {
     name: '',
-    barcode: '',
     categoryId: '',
     activityCategoryId: '',
     unit: '',
@@ -249,8 +244,6 @@ const initFormData = (val: any) => {
   state.formData = {
     name: val.name,
     categoryId: val.categoryId,
-    activityCategoryId: val.activityCategoryId,
-    barcode: val.barcode,
     unit: val.unit,
     sketch: val.sketch,
     details: val.details,

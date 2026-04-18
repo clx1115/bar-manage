@@ -10,9 +10,6 @@
               <el-radio-button :label="-1">已下架</el-radio-button>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="条形码">
-            <el-input v-model="queryData.barcode" size="default" placeholder="条形码" clearable> </el-input>
-          </el-form-item>
           <el-form-item label="关键字">
             <el-input v-model="queryData.filter" size="default" placeholder="关键字" clearable> </el-input>
           </el-form-item>
@@ -89,7 +86,7 @@
         <el-table-column prop="coverImgUrl" label="图片" width="100">
           <template #default="{ row }"><img :src="row.coverImgUrl" class="smallImage"></template>
         </el-table-column>
-        <el-table-column prop="barcode" label="条形码" min-width="100" show-overflow-tooltip />
+
         <el-table-column prop="name" label="名称" min-width="100" show-overflow-tooltip />
         <el-table-column prop="unit" label="单位" width="80" show-overflow-tooltip />
         <el-table-column label="价格" width="150">
@@ -157,7 +154,6 @@ import XLSX from 'xlsx'
 const defaultQuery = {
   status: 0,
   filter: '',
-  barcode: '',
   categoryId: '',
 }
 const state = reactive({
@@ -242,7 +238,6 @@ const downloadFile = () => {
       const exportJsonToExcel = excel.export_json_to_excel
       const tableHead = [
         'ID',
-        '条形码',
         '名称',
         '单位',
         '价格',
@@ -253,7 +248,6 @@ const downloadFile = () => {
       ]
       const filterVal = [
         'id',
-        'barcode',
         'name',
         'unit',
         'price',
@@ -303,7 +297,6 @@ const onImport = (file: any) => {
               dataList.push({
                 id: item['ID'],
                 name: item['名称'],
-                barcode: item['条形码'],
                 categoryName: item['分类名称'],
                 unit: item['单位'],
                 sort: item['排列序号'] || 1,

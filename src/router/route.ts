@@ -527,6 +527,21 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
               icon: '',
             },
           },
+          {
+            path: '/product/item',
+            name: 'productItem',
+            component: () => import('@/views/product/item/index.vue'),
+            meta: {
+              title: '平台类目',
+              isLink: '',
+              isHide: false,
+              isKeepAlive: true,
+              isAffix: false,
+              isIframe: false,
+              roles: ['admin'],
+              icon: 'ele-Menu',
+            },
+          },
         ],
       },
       // {

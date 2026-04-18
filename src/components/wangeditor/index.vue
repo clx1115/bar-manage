@@ -71,7 +71,7 @@ const uploadImage = {
     data.append('file', file) // file 即选中的文件
     const config = {
       method: 'post',
-      url: '/v2/shop/upload/', // 上传图片地址
+      url: '/v1/shop/upload/', // 上传图片地址
       data,
       headers: {
         'X-Requested-With': '*',
@@ -124,7 +124,7 @@ const uploadVideo = {
     data.append('file', file) // file 即选中的文件
     const config = {
       method: 'post',
-      url: '/v2/shop/upload/', // 上传地址
+      url: '/v1/shop/upload/', // 上传地址
       data,
       headers: {
         'X-Requested-With': '*',
