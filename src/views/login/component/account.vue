@@ -71,8 +71,6 @@ const state = reactive({
   loginForm: {
     username: '',
     password: '',
-    vcode: '',
-    checked: false,
   } as any, //登录表单
   loginRules: {
     username: [
@@ -99,7 +97,7 @@ const onLogin = async () => {
 
 //确认登录
 const handleSubmit = async (captchaId: any) => {
-  state.loginForm.vcode = captchaId
+  // state.loginForm.vcode = captchaId
   state.loading = true
   storesUserInfo
     .login(state.loginForm)

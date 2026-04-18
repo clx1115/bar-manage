@@ -29,13 +29,13 @@ export default defineConfig({
   //启动服务配置
   server: {
     host: '0.0.0.0',
-    port: 9000,
+    port: 9001,
     open: true,
     https: false,
     // 配置跨域处理
     proxy: {
-      '/v2': {
-        target: 'https://wm.bxnet.net',
+      '/v1': {
+        target: 'https://r.xcx100.info/bar-manager-api',
         changeOrigin: true,
       },
     },

@@ -10,7 +10,6 @@ declare interface UserInfoState<T = any> {
     avatar: string
     authBtnList: string[]
     roles: string[]
-    orgId: number
   }
 }
 

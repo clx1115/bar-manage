@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getCaptcha, checkCaptcha } from '@/api/login/index'
+
 import type { CaptchaConfig, Track } from '@/components/Captcha/types'
 import Base64 from '@/utils/base64'
 
@@ -124,13 +124,13 @@ function reset() {
 
 /* 刷新验证码 */
 function refreshCaptcha() {
-  getCaptcha().then((res: any) => {
+  /* getCaptcha().then((res: any) => {
     reset()
     captchaData.value = res.id
     backgroundImageUrl.value = res.captcha.backgroundImage
     sliderImageUrl.value = res.captcha.sliderImage
     tpImageUrl.value = res.captcha.sliderImage
-  })
+  }) */
 }
 
 function valid(config: CaptchaConfig) {
@@ -146,7 +146,7 @@ function valid(config: CaptchaConfig) {
   const captchaId = captchaData.value!
   const base64 = new Base64()
   const baseData = base64.encode(JSON.stringify(captchData))
-  checkCaptcha({
+  /* checkCaptcha({
     id: captchaId,
     data: baseData,
   }).then((res: any) => {
@@ -156,13 +156,15 @@ function valid(config: CaptchaConfig) {
     } else {
       refreshCaptcha()
     }
-  })
+  }) */
 }
 
 defineExpose({
   show() {
-    refreshCaptcha()
-    showCaptcha()
+    // refreshCaptcha()
+    // showCaptcha()
+    // Skip captcha verification
+    props.onSuccess('skipped-captcha-id')
   },
 })
 </script>

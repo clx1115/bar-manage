@@ -148,7 +148,6 @@ import {
   setStatus,
   batchSetStatus,
   deleteProduct,
-  batchCloneProduct,
   batchUpdateProduct
 } from '@/api/product/index'
 import { getCategroyList } from '@/api/product/category/index'
@@ -373,11 +372,11 @@ const batchStatus = (status: number) => {
 
 // 批量绑定商品到店铺
 const batchClone = () => {
-  batchCloneProduct({
+  /* batchCloneProduct({
     list: state.selectedList.map((item: any) => item.id),
   }).then(() => {
     ElMessage.success('绑定成功')
-  })
+  }) */
 }
 
 // 页面加载时

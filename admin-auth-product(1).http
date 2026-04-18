@@ -1,0 +1,715 @@
+### ==========================================
+### 登录 + 商品管理联调说明
+### 先用登录接口拿到 token，再把 token 放到 X-AUTH-TOKEN-UID 调商品、分类和平台类目接口。
+### 路由以 conf/routes 为准；登录相关 @api 路径和实际路由不一致的地方已在下面注明。
+### ==========================================
+
+@baseUrl = https://r.xcx100.info/bar-manager-api/
+@authToken = 2cdfd94d-9cfd-4077-9d10-3f3fc314c2c3
+@adminUid = 1
+@productId = 1
+@categoryId = 1
+@itemId = 1
+@page = 1
+@size = 10
+
+### 01 01商户登录
+### Method: login
+### HTTP: POST /v1/shop/login/noauth/
+### Note: @api Javadoc still写着 /v1/s/login/noauth/，实际路由以 conf/routes 为准。
+### Description: 管理员登录，成功后返回 token。
+### Request body:
+### - username: 登录用户名，通常是手机号或账号名
+### - password: 登录密码，6-20 位
+### - vcode: 短信验证码，预留字段
+### - type: 登录类型，传 pos 时会额外校验店铺绑定
+### Success fields:
+### - code: 200 成功
+### - token: 登录 token，后续请求放到 X-AUTH-TOKEN-UID
+### - id: 管理员 ID
+### - userName: 用户名
+### - realName: 真名
+### - avatar: 头像
+### - phoneNumber: 手机号
+### - orgId: 店铺所属组织 ID
+### - orgName: 店铺所属组织名称
+### - shopId: 店铺 ID
+### - shopName: 店铺名
+### - status: 账号状态，1 正常，2 锁定
+### - isAdmin: 是否管理员
+### - createdTime: 创建时间
+### - lastLoginTimeForShow: 最后登录时间
+### - lastLoginIP: 最后登录 IP
+### - groupName: 所在组名
+### Error fields:
+### - 40001: 参数错误
+### - 40003: 用户名或密码错误
+### - 40008: 账号或店铺状态异常
+# @name login
+POST {{baseUrl}}/v1/shop/login/noauth/
+Content-Type: application/json
+
+{
+  "username": "18159412053",
+  "password": "123456"
+}
+
+### 02 04是否已登录
+### Method: isLogin
+### HTTP: POST /v1/shop/is_login/
+### Note: @api Javadoc uses /v2/shop/is_login/; route path differs.
+### Auth: X-AUTH-TOKEN-UID
+### Success fields:
+### - code: 200
+### - login: true/false，true 表示 token 有效并且已登录
+# @name isLogin
+POST {{baseUrl}}/v1/shop/is_login/
+X-AUTH-TOKEN-UID: {{authToken}}
+
+### 03 04商户入驻注册
+### Method: signUp
+### HTTP: POST /v1/shop/user/new/
+### Note: @api Javadoc uses /v2/shop/user/new/; route path differs.
+### Request body:
+### - phoneNumber: 手机号
+### - orgId: 店铺 ID，注册后会绑定到该店铺
+### - password: 登录密码
+### - vCode: 短信验证码，预留字段
+### Success fields:
+### - code: 200 创建成功
+### Error fields:
+### - 40001: 参数错误或密码无效
+### - 40002: 账号已被注册
+### - 40003: 无效的短信验证码
+### - 40006: 无效的手机号码
+# @name signUp
+POST {{baseUrl}}/v1/shop/user/new/
+Content-Type: application/json
+
+{
+  "phoneNumber": "18159412053",
+  "password": "123456",
+  "orgId": 1
+}
+
+### 04 08查看自己详情信息
+### Method: getAdminMemberInfo
+### HTTP: POST /v1/shop/admin_member/info/
+### Note: @api Javadoc uses /v2/shop/admin_member/info/; route path differs.
+### Auth: X-AUTH-TOKEN-UID
+### Success fields:
+### - code: 200
+### - id: 用户 ID
+### - name: 用户名/真名
+### - nickName: 用户名
+### - avatar: 头像
+### - phoneNumber: 手机号
+### - status: 状态，1 正常，2 锁定
+### - orgId: 店铺所属组织 ID
+### - orgName: 店铺所属组织名称
+### - shopName: 店铺名
+### - shopId: 店铺 ID
+### - isAdmin: 是否管理员
+### - introduction: 介绍，当前实现固定返回空字符串
+### - lastLoginTime: 最后登录时间戳
+### - lastLoginIP: 最后登录 IP
+# @name getAdminMemberInfo
+POST {{baseUrl}}/v1/shop/admin_member/info/
+X-AUTH-TOKEN-UID: {{authToken}}
+
+
+### 06 11设置/修改登录密码
+### Method: setLoginPassword
+### HTTP: POST /v1/shop/set_login_password/
+### Note: @api Javadoc uses /v2/shop/set_login_password/; route path differs.
+### Auth: X-AUTH-TOKEN-UID
+### Request body:
+### - uid: 当前登录管理员 ID，必须和 token 对应
+### - password: 新密码
+### - oldPassword: 旧密码，可选
+### - vcode: 短信验证码，可选
+### Success fields:
+### - code: 200
+### Error fields:
+### - 403: 没有权限使用该功能
+### - 40001: 原密码有误
+### - 40003: 无效的密码
+### - 40004: 该帐号不存在
+# @name setLoginPassword
+POST {{baseUrl}}/v1/shop/set_login_password/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "uid": {{adminUid}},
+  "password": "1234567",
+  "oldPassword": "123456"
+}
+
+### 07 01店铺商品列表
+### Method: listProducts
+### HTTP: POST /v1/shop/product_list/
+### Auth: X-AUTH-TOKEN-UID
+### Body params:
+### - page: 页码，0 表示不分页
+### - status: 商品状态，-1 下架，1 上架，0 表示不过滤
+### - filter: 商品 ID 或商品名称关键字
+### - barcode: 条形码
+### - categoryId: 分类 ID，包含子分类
+### - activityCategoryId: 活动分类 ID，包含子分类
+### Success fields:
+### - code: 200
+### - pages: 总页数，page=0 时不返回
+### - list: 商品列表
+### - list[].id: 商品 ID
+### - list[].orgId: 店铺 ID
+### - list[].categoryId: 分类 ID
+### - list[].name: 商品名称
+### - list[].price: 价格
+### - list[].description: 简短描述
+### - list[].stock: 库存
+### - list[].stockMode: 库存模式，1 现做，2 现有库存
+### - list[].soldAmount: 销量
+### - list[].imageUrl: 商品缩略图
+### - list[].status: 商品状态，-1 下架，1 上架
+### - status: 这里会在上架和下架之间切换
+### - list[].unit: 单位
+### - list[].itemId: 平台类目 ID
+### - list[].limitAmount: 限购数量
+### - list[].sort: 排序
+### - list[].createdTime: 创建时间
+### - list[].updateTime: 修改时间
+### Error fields:
+### - 40001: 参数有误或店铺不存在
+# @name listProducts
+POST {{baseUrl}}/v1/shop/product_list/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "page": {{page}},
+  "status": 1,
+  "filter": "面",
+  "barcode": "SP-0001",
+  "categoryId": {{categoryId}},
+  "activityCategoryId": 0
+}
+
+### 08 02店铺商品详情
+### Method: getProduct
+### HTTP: GET /v1/shop/products/:productId/
+### Auth: X-AUTH-TOKEN-UID
+### Path params:
+### - productId: 商品ID
+### Success fields:
+### - code: 200
+### - id: 商品 ID
+### - orgId: 店铺 ID
+### - categoryId: 分类 ID
+### - name: 商品名称
+### - price: 价格
+### - description: 简短描述
+### - stock: 库存
+### - stockMode: 库存模式，1 现做，2 现有库存
+### - soldAmount: 销量
+### - imageUrl: 商品缩略图
+### - status: 商品状态，-1 下架，1 上架
+### - sku: sku 字符串
+### - unit: 单位
+### - itemId: 平台类目 ID
+### - limitAmount: 限购数量
+### - sort: 排序
+### - createdTime: 创建时间
+### - updateTime: 修改时间
+### Error fields:
+### - 40001: 参数错误
+### - 40002: 该商品不存在
+# @name getProduct
+GET {{baseUrl}}/v1/shop/products/{{productId}}/
+X-AUTH-TOKEN-UID: {{authToken}}
+
+### 09 03添加店铺商品
+### Method: addProduct
+### HTTP: POST /v1/shop/products/new/
+### Auth: X-AUTH-TOKEN-UID
+### Request body:
+### - name: 商品名称，必填
+### - categoryId: 分类ID
+### - description: 简短描述
+### - price: 价格，单位元
+### - stock: 库存
+### - stockMode: 库存模式，1 现做，2 现有库存
+### - soldAmount: 销量
+### - imageUrl: 商品缩略图
+### - status: 商品状态，-1 下架，1 上架
+### - sku: sku 字符串
+### - unit: 单位
+### - itemId: 平台类目ID
+### - limitAmount: 限购数量
+### - sort: 排序
+### Success fields:
+### - code: 200
+### - id: 新增商品ID
+### Error fields:
+### - 40001: 参数错误或商品名为空
+### - 40002: 店铺不存在
+# @name addProduct
+POST {{baseUrl}}/v1/shop/products/new/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "name": "雪花啤酒（500ml）",
+  "categoryId": {{categoryId}},
+  "description": "经典热销商品",
+  "price": 19.9,
+  "stock": 100,
+  "stockMode": 2,
+  "soldAmount": 0,
+  "imageUrl": "https://example.com/product.jpg",
+  "status": 1,
+  "sku": "SKU-0001",
+  "unit": "份",
+  "itemId": {{itemId}},
+  "limitAmount": 1,
+  "sort": 1
+}
+
+### 10 04修改商品信息
+### Method: updateProduct
+### HTTP: POST /v1/shop/products/:productId/
+### Auth: X-AUTH-TOKEN-UID
+### Path params:
+### - productId: 商品ID
+### Body params:
+### - name: 商品名称
+### - categoryId: 分类ID
+### - unit: 单位
+### - sort: 排序
+### - price: 价格
+### - itemId: 平台类目ID
+### - soldAmount: 销量
+### - sku: sku 字符串
+### - stockMode: 库存模式
+### - limitAmount: 限购数量
+### Success fields:
+### - code: 200
+### - id: 商品ID
+### Error fields:
+### - 40002: 该商品不存在
+# @name updateProduct
+POST {{baseUrl}}/v1/shop/products/{{productId}}/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "name": "雪花啤酒（500ml）-更新",
+  "categoryId": {{categoryId}},
+  "unit": "份",
+  "sort": 2,
+  "price": 22.9,
+  "itemId": {{itemId}},
+  "soldAmount": 120,
+  "sku": "SKU-0001-XL",
+  "stockMode": 1,
+  "limitAmount": 2
+}
+
+### 11 05删除店铺商品
+### Method: deleteProduct
+### HTTP: POST /v1/shop/products/
+### Auth: X-AUTH-TOKEN-UID
+### Body params:
+### - operation: 固定传 del
+### - list: 商品ID数组，至少 1 个
+### Success fields:
+### - code: 200
+### - 返回为空，表示删除成功
+### Error fields:
+### - 40001: 参数错误
+# @name deleteProduct
+POST {{baseUrl}}/v1/shop/products/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "operation": "del",
+  "list": [1, 2]
+}
+
+### 12 06店铺上架/下架商品
+### Method: switchProductStatus
+### HTTP: POST /v1/shop/product_status/:productId/
+### Auth: X-AUTH-TOKEN-UID
+### Path params:
+### - productId: 商品ID
+### Success fields:
+### - code: 200
+### - id: 商品ID
+### - status: 这里会在上架和下架之间切换
+### Error fields:
+### - 40001: 参数错误
+### - 40002: 该商品不存在
+# @name switchProductStatus
+POST {{baseUrl}}/v1/shop/product_status/{{productId}}/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{}
+
+### 13 08批量上架/下架
+### Method: batchUpdateProductStatus
+### HTTP: POST /v1/shop/batch_update_product_status/
+### Auth: X-AUTH-TOKEN-UID
+### Body params:
+### - status: 商品状态，1 上架，-1 下架
+### - list: 商品ID数组
+### Success fields:
+### - code: 200
+### - 返回为空，表示批量更新成功
+### Error fields:
+### - 40001: 参数错误
+### - 40002: 状态参数有误或 list 参数有误
+# @name batchUpdateProductStatus
+POST {{baseUrl}}/v1/shop/batch_update_product_status/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "status": 1,
+  "list": [1, 2, 3]
+}
+
+### 14 09批量更新店铺商品
+### Method: batchUpdateProduct
+### HTTP: POST /v1/shop/batch_update_product/
+### Auth: X-AUTH-TOKEN-UID
+### Body params:
+### - list: 商品列表，id 不存在时会新增一条记录
+### - list[].id: 商品ID
+### - list[].name: 商品名称
+### - list[].categoryName: 分类名称，按名称匹配已有分类
+### - list[].status: 商品状态，传“上架”或“下架”
+### - list[].barcode: 条形码
+### - list[].unit: 单位
+### - list[].sketch: 简介
+### - list[].sort: 排序
+### Success fields:
+### - code: 200
+### - 返回为空，表示批量写入成功
+### Error fields:
+### - 40001: 参数错误
+### - 40002: list 参数有误
+# @name batchUpdateProduct
+POST {{baseUrl}}/v1/shop/batch_update_product/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "list": [
+    {
+      "id": 1,
+      "name": "雪花啤酒（500ml）",
+      "categoryName": "经典",
+      "status": "上架",
+      "barcode": "SP-0001",
+      "unit": "份",
+      "sketch": "经典热销",
+      "sort": 1
+    },
+    {
+      "id": 2,
+      "name": "青岛啤酒",
+      "categoryName": "经典",
+      "status": "下架",
+      "barcode": "SP-0002",
+      "unit": "份",
+      "sketch": "酸辣口味",
+      "sort": 2
+    }
+  ]
+}
+
+### 15 01商品分类列表
+### Method: listProductCategories
+### HTTP: GET /v1/shop/product_categories/
+### Auth: X-AUTH-TOKEN-UID
+### Query params:
+### - filter: 分类名称，模糊查询
+### - parentId: 父分类ID，0 表示一级分类
+### Success fields:
+### - code: 200
+### - list: 分类列表
+### - list[].id: 分类ID
+### - list[].orgId: 店铺ID
+### - list[].parentId: 父分类ID
+### - list[].name: 分类名称
+### - list[].imgUrl: 图片URL
+### - list[].poster: 海报图片
+### - list[].path: 路径
+### - list[].pathName: 路径名称
+### - list[].pinyinAbbr: 拼音缩写
+### - list[].show: 是否显示，1 显示，2 隐藏
+### - list[].exclude: 是否排除打折
+### - list[].needTimeToMake: 是否需要额外制作时间
+### - list[].discountJson: 分类折扣JSON字符串
+### - list[].sort: 排序顺序
+### - list[].categoryType: 分类类型，0 普通分类，1 用户分类，2 采购分类
+### - list[].soldAmount: 已售数量
+### - list[].createTime: 创建时间
+### - list[].children: 子分类，字段结构同 list 项
+### Error fields:
+### - 40001: 参数错误或未登录
+# @name listProductCategories
+GET {{baseUrl}}/v1/shop/product_categories/?filter=&parentId=0
+X-AUTH-TOKEN-UID: {{authToken}}
+
+### 16 02商品分类详情
+### Method: getProductCategory
+### HTTP: GET /v1/shop/product_categories/:categoryId/
+### Auth: X-AUTH-TOKEN-UID
+### Path params:
+### - categoryId: 商品分类ID
+### Success fields:
+### - code: 200
+### - id: 分类ID
+### - orgId: 店铺ID
+### - parentId: 父分类ID
+### - name: 分类名称
+### - imgUrl: 图片URL
+### - poster: 海报图片
+### - path: 路径
+### - pathName: 路径名称
+### - pinyinAbbr: 拼音缩写
+### - show: 是否显示，1 显示，2 隐藏
+### - exclude: 是否排除打折
+### - needTimeToMake: 是否需要额外制作时间
+### - discountJson: 分类折扣JSON字符串
+### - sort: 排序顺序
+### - categoryType: 分类类型，0 普通分类，1 用户分类，2 采购分类
+### - soldAmount: 已售数量
+### - createTime: 创建时间
+### - children: 子分类，字段结构同当前分类
+### Error fields:
+### - 40001: 参数错误或分类不属于当前店铺
+### - 40002: 该商品分类不存在
+# @name getProductCategory
+GET {{baseUrl}}/v1/shop/product_categories/{{categoryId}}/
+X-AUTH-TOKEN-UID: {{authToken}}
+
+### 17 03添加店铺商品分类
+### Method: addProductCategory
+### HTTP: POST /v1/shop/product_categories/new/
+### Auth: X-AUTH-TOKEN-UID
+### Description: 创建后会自动生成拼音和路径，并刷新分类缓存。
+### Body params:
+### - name: 分类名称
+### - imgUrl: 图片地址
+### - poster: 海报图片地址
+### - show: 显示状态，1 显示，2 隐藏
+### - parentId: 父分类ID，0 表示一级分类
+### - sort: 排序顺序
+### - exclude: 是否排除打折
+### Success fields:
+### - code: 200
+### - 返回为空，表示创建成功
+### Error fields:
+### - 40001: 参数错误、店铺不存在或父类 ID 不存在
+# @name addProductCategory
+POST {{baseUrl}}/v1/shop/product_categories/new/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "name": "经典",
+  "imgUrl": "https://example.com/category.jpg",
+  "poster": "https://example.com/category-poster.jpg",
+  "show": 1,
+  "parentId": 0,
+  "sort": 10,
+  "exclude": false
+}
+
+### 18 04修改店铺商品分类
+### Method: updateProductCategory
+### HTTP: POST /v1/shop/product_categories/:categoryId/
+### Auth: X-AUTH-TOKEN-UID
+### Path params:
+### - categoryId: 商品分类ID
+### Description: 更新分类信息；如果将 show 置为 2，会同步隐藏子分类。
+### Body params:
+### - name: 分类名称
+### - imgUrl: 图片地址
+### - poster: 海报图片地址
+### - show: 显示状态，1 显示，2 隐藏
+### - parentId: 父分类ID，0 表示一级分类
+### - sort: 排序顺序
+### - exclude: 是否排除打折
+### Success fields:
+### - code: 200
+### - 返回为空，表示更新成功
+### Error fields:
+### - 40001: 参数错误或分类不属于当前店铺
+### - 40002: 分类不存在或父子分类冲突
+# @name updateProductCategory
+POST {{baseUrl}}/v1/shop/product_categories/{{categoryId}}/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "name": "经典",
+  "imgUrl": "https://example.com/category.jpg",
+  "poster": "https://example.com/category-poster.jpg",
+  "show": 2,
+  "parentId": 0,
+  "sort": 11,
+  "exclude": true
+}
+
+### 19 05删除店铺商品分类
+### Method: deleteProductCategory
+### HTTP: POST /v1/shop/product_categories/
+### Auth: X-AUTH-TOKEN-UID
+### Description: 仅允许删除没有子分类的分类。
+### Body params:
+### - categoryId: 商品分类ID
+### - operation: 传 del 表示删除
+### Success fields:
+### - code: 200
+### - 返回为空，表示删除成功
+### Error fields:
+### - 40001: 参数错误或分类不存在
+### - 40003: 该分类为父级分类，不能直接删除
+# @name deleteProductCategory
+POST {{baseUrl}}/v1/shop/product_categories/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "categoryId": {{categoryId}},
+  "operation": "del"
+}
+
+### 20 01列表-平台类目
+### Method: listItem
+### HTTP: POST /v1/shop/item_list/
+### Auth: X-AUTH-TOKEN-UID
+### Description: page=0 时返回全部数据，否则分页返回。
+### Body params:
+### - page: 页码，0 表示不分页
+### - size: 每页大小
+### Success fields:
+### - code: 200
+### - pages: 总页数，page=0 时不返回
+### - hasNest: 是否还有下一页（代码实际字段名）
+### - list: 平台类目列表
+### - list[].id: 类目ID
+### - list[].name: 类目名字
+### - list[].imgUrl: 类目图片
+### - list[].show: 是否显示，1 显示，2 隐藏
+### - list[].createTime: 创建时间
+### - list[].updateTime: 更新时间
+### Error fields:
+### - 40001: 参数错误或未登录
+# @name listItem
+POST {{baseUrl}}/v1/shop/item_list/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "page": {{page}},
+  "size": {{size}}
+}
+
+### 21 02详情-Item平台类目
+### Method: getItem
+### HTTP: GET /v1/shop/item/:id/
+### Auth: X-AUTH-TOKEN-UID
+### Path params:
+### - id: 类目ID
+### Success fields:
+### - code: 200
+### - id: 类目ID
+### - name: 类目名字
+### - imgUrl: 类目图片
+### - show: 是否显示，1 显示，2 隐藏
+### - createTime: 创建时间
+### - updateTime: 更新时间
+### Error fields:
+### - 40001: 数据不存在
+# @name getItem
+GET {{baseUrl}}/v1/shop/item/{{itemId}}/
+X-AUTH-TOKEN-UID: {{authToken}}
+
+### 22 01添加-Item平台类目
+### Method: addItem
+### HTTP: POST /v1/shop/item/new/
+### Auth: X-AUTH-TOKEN-UID
+### Description: 新增后会自动写入创建时间和更新时间。
+### Body params:
+### - name: 类目名字
+### - imgUrl: 类目图片
+### - show: 是否显示，1 显示，2 隐藏
+### Success fields:
+### - code: 200
+### - 返回为空，表示创建成功
+### Error fields:
+### - 40001: 参数错误或类目名字为空
+# @name addItem
+POST {{baseUrl}}/v1/shop/item/new/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "name": "热销类目",
+  "imgUrl": "https://example.com/item.jpg",
+  "show": 1
+}
+
+### 23 04更新-Item平台类目
+### Method: updateItem
+### HTTP: POST /v1/shop/item/:id/
+### Auth: X-AUTH-TOKEN-UID
+### Path params:
+### - id: 类目ID
+### Body params:
+### - name: 类目名字
+### - imgUrl: 类目图片
+### - show: 是否显示，1 显示，2 隐藏
+### Success fields:
+### - code: 200
+### - 返回为空，表示更新成功
+### Error fields:
+### - 40001: 数据不存在
+# @name updateItem
+POST {{baseUrl}}/v1/shop/item/{{itemId}}/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "name": "热销类目（更新）",
+  "imgUrl": "https://example.com/item-new.jpg",
+  "show": 2
+}
+
+### 24 05删除-平台类目
+### Method: deleteItem
+### HTTP: POST /v1/shop/item/
+### Auth: X-AUTH-TOKEN-UID
+### Body params:
+### - id: 唯一标识
+### - operation: 传 del 表示删除
+### Success fields:
+### - code: 200
+### - 返回为空，表示删除成功
+### Error fields:
+### - 40001: 操作错误或数据不存在
+# @name deleteItem
+POST {{baseUrl}}/v1/shop/item/
+Content-Type: application/json
+X-AUTH-TOKEN-UID: {{authToken}}
+
+{
+  "id": "1",
+  "operation": "del"
+}

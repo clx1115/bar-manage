@@ -10,11 +10,13 @@ import 'element-plus/dist/index.css'
 import '@/theme/index.scss'
 import 'virtual:svg-icons-register'
 
-import {hiPrintPlugin} from 'vue-plugin-hiprint'
+// import {hiPrintPlugin} from 'vue-plugin-hiprint'
 
 const app = createApp(App)
 
 directive(app)
 other.elSvg(app)
 
-app.use(pinia).use(router).use(ElementPlus).use(hiPrintPlugin).mount('#app')
+app.use(pinia).use(router).use(ElementPlus)
+    // .use(hiPrintPlugin)
+    .mount('#app')

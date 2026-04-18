@@ -1,76 +1,86 @@
 import request from '@/utils/request'
 
 /**
- * 登录
+ * 01 01商户登录
  */
 export function login(data: object) {
+  console.log(data)
   return request({
-    url: '/v2/shop/login/noauth/',
+    url: '/v1/shop/login/noauth/',
     method: 'post',
     data,
   })
 }
 
-//验证是否登录
+// 02 04是否已登录
 export function getIsLogin(data: object) {
   return request({
-    url: '/v2/shop/is_login/',
+    url: '/v1/shop/is_login/',
     method: 'post',
     data,
   })
 }
 
-//获取用户信息
-export function getUserInfo() {
+// 03 04商户入驻注册
+export function signUp(data: object) {
   return request({
-    url: '/v2/shop/admin_member/info/',
-    method: 'get',
+    url: '/v1/shop/user/new/',
+    method: 'post',
+    data,
   })
 }
 
-//登出
+// 04 08查看自己详情信息
+export function getUserInfo() {
+  return request({
+    url: '/v1/shop/admin_member/info/',
+    method: 'post', // Changed to POST as per .http
+  })
+}
+
+/* //登出
 export function logout() {
   return request({
     url: '/v2/shop/logout/',
     method: 'post',
   })
-}
+} */
 
-export function getVcode(data: object) {
+/* export function getVcode(data: object) {
   return request({
     url: '/v1/user/request_vcode/',
     method: 'post',
     data,
   })
-}
+} */
 
-//获取验证码
+/* //获取验证码
 export function getCaptcha() {
   return request({
     url: '/v2/shop/captcha/gen/noauth/',
     method: 'get',
   })
-}
+} */
 
-//验证验证码
+/* //验证验证码
 export function checkCaptcha(data: object) {
   return request({
     url: '/v2/shop/captcha/check/noauth/',
     method: 'post',
     data,
   })
-}
+} */
 
-//修改登录密码
+// 06 11设置/修改登录密码
 export function updatePassword(data: object) {
   return request({
-    url: '/v2/shop/admin_member_password/',
+    url: '/v1/shop/set_login_password/',
     method: 'post',
     data,
   })
 }
 
-//获取当前登录角色菜单
+/* //获取当前登录角色菜单
 export function getRoutes() {
   return new Promise((resolve) => {
     request({
@@ -138,4 +148,4 @@ export function getRoutes() {
       resolve(list)
     })
   })
-}
+} */

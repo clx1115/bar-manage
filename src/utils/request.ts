@@ -24,6 +24,7 @@ service.interceptors.request.use(
     config.headers!['t'] = config.headers!['t'] || t
     config.headers!['nonce'] = config.headers!['nonce'] || nonce
     config.headers!['s'] = config.headers!['s'] || s
+    console.log(config)
     return config
   },
   (error) => {
@@ -35,6 +36,7 @@ service.interceptors.request.use(
 // 添加响应拦截器
 service.interceptors.response.use(
   (response) => {
+    console.log(response)
     // 对响应数据做点什么
     const data = response.data
     if (data.code !== 200) {

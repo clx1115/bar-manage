@@ -13,8 +13,7 @@ export const useUserInfo = defineStore('userInfo', {
       name: '',
       avatar: '',
       roles: [],
-      authBtnList: [],
-      orgId: 0,
+      authBtnList: []
     },
   }),
   actions: {
@@ -36,7 +35,6 @@ export const useUserInfo = defineStore('userInfo', {
               avatar: res.avatar,
               roles: [res.rules],
               authBtnList: [],
-              orgId: res.orgId,
             }
             resolve(userInfos)
           })
@@ -46,22 +44,21 @@ export const useUserInfo = defineStore('userInfo', {
       })
     },
     async login(loginData: any) {
-      const { username, password, vcode } = loginData
+      console.log(loginData)
+      const { username, password } = loginData // vcode removed
       return new Promise((resolve, reject) => {
         login({
           username: username.trim(),
-          password: password.trim(),
-          vcode: vcode.trim(),
+          password: password.trim()
         })
           .then((response: any) => {
-            const { token, realName, avatar, orgId, rules } = response
+            const { token, realName, avatar, rules } = response
             Session.setString('token', token)
             const userInfos = {
-              name: realName,
-              avatar: avatar,
-              roles: [rules],
-              authBtnList: [],
-              orgId: orgId,
+              name: response.realName,
+              avatar: response.avatar,
+              roles: [response.rules || 'admin'],
+              authBtnList: []
             }
             Session.set('userInfo', userInfos)
             this.userInfos = userInfos
