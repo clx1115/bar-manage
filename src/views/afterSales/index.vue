@@ -8,48 +8,20 @@
               <el-radio-button :label="0">
                 全部
               </el-radio-button>
-              <el-radio-button :label="10">
-                申请中
-                <el-badge :value="count.postServiceOrders"></el-badge>
-              </el-radio-button>
-              <el-radio-button :label="20">
-                等待回寄
-              </el-radio-button>
               <el-radio-button :label="30">
                 待退款
-              </el-radio-button>
-              <el-radio-button :label="40">
-                等待系统退款
+                <el-badge :value="count.toBeRefundedOrders" v-if="count.toBeRefundedOrders > 0"></el-badge>
               </el-radio-button>
               <el-radio-button :label="50">
                 已退款
-              </el-radio-button>
-              <el-radio-button :label="-10">
-                已取消
-              </el-radio-button>
-              <el-radio-button :label="-20">
-                拒绝申请
-              </el-radio-button>
-              <el-radio-button :label="-30">
-                拒绝申请退款
-              </el-radio-button>
-              <el-radio-button :label="-11">
-                超时退货取消
               </el-radio-button>
             </el-radio-group>
           </el-form-item>
         </el-row>
         <el-row>
           <el-form-item label="订单编号">
-            <el-input v-model="queryData.orderNo" size="default" placeholder="订单编号" style="width:120px" clearable>
+            <el-input v-model="queryData.orderNo" size="default" placeholder="订单编号/售后编号" style="width:200px" clearable>
             </el-input>
-          </el-form-item>
-          <el-form-item label="售后类型">
-            <el-select v-model="queryData.state" size="default" placeholder="售后类型" clearable>
-              <el-option label="全部" :value="0" />
-              <el-option label="退款" :value="1" />
-              <el-option label="退货退款" :value="2" />
-            </el-select>
           </el-form-item>
           <el-form-item label="日期">
             <el-date-picker size="default" v-model="timeRange" type="daterange" range-separator="至"
@@ -115,6 +87,7 @@
               <router-link :to="`/afterSales/detail?returnId=${row.id}`" class="mr10">
                 <el-button size="small" text type="primary">详情</el-button>
               </router-link>
+              <el-button size="small" text type="primary" @click="onDirectRefund(row)">直接退款</el-button>
             </el-form>
           </template>
         </el-table-column>
@@ -124,6 +97,7 @@
           :page-count="totalPage" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
       </div>
     </el-card>
+    <directRefund ref="directRefundRef" @refresh="getListData" />
   </div>
 </template>
 <script lang="ts">
@@ -146,17 +120,23 @@ import {
   ref,
   toRefs,
   watch,
+  defineAsyncComponent,
 } from 'vue'
 import { formatDate } from '@/utils/formatTime'
 import { getAfterSalesList } from '@/api/afterSales/index'
 import { formatAfterSalesStatus, parseMoney } from '@/utils/filters'
 import { getOrderCount } from '@/api/order/index'
 
+// 引入组件
+const directRefund = defineAsyncComponent(
+  () => import('./component/directRefund.vue')
+)
+
 // 定义变量
+const directRefundRef = ref()
 const defaultQuery = {
   status: 0,
   orderNo: '',
-  state: '',
   beginTime: 0,
   endTime: 0,
 }
@@ -219,6 +199,11 @@ const refreshQuery = () => {
   state.queryData = Object.assign({}, defaultQuery)
   timeRange.value = ''
   getListData()
+}
+
+// 直接退款
+const onDirectRefund = (row?: any) => {
+  directRefundRef.value.openDialog(row?.orderId)
 }
 
 

@@ -3,9 +3,9 @@ import request from '@/utils/request'
 //获取售后订单列表
 export function getAfterSalesList(data: object) {
   return request({
-    url: '/v2/shop/return_orders_list/',
-    method: 'get',
-    params: data,
+    url: '/v1/shop/return_orders_list/',
+    method: 'post',
+    data,
   })
 }
 
@@ -15,6 +15,15 @@ export function getAfterSalesDetail(data: any) {
     url: `/v2/shop/order_returns/${data.id}/`,
     method: 'get',
     params: {},
+  })
+}
+
+// 平台直接退款（直接创建售后单）
+export function directRefundOrder(data: any) {
+  return request({
+    url: '/v1/shop/refund_order_direct/',
+    method: 'post',
+    data,
   })
 }
 
@@ -44,3 +53,4 @@ export function handleOrderRefund(data: any) {
     data,
   })
 }
+
