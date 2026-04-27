@@ -91,13 +91,7 @@
         <el-table-column prop="unit" label="单位" width="80" show-overflow-tooltip />
         <el-table-column label="价格" width="150">
           <template #default="{ row }">
-            <span v-if="row.minPrice === row.maxPrice"> {{ parseMoney(row.minPrice) }} </span>
-            <span v-else> {{ parseMoney(row.minPrice) }} ~ {{ parseMoney(row.maxPrice) }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="原价" width="80">
-          <template #default="{ row }">
-            {{ parseMoney(row.oldPrice) }}
+            <span> {{Number( row.price)/100}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="sort" label="排列序号" width="100" />
@@ -231,7 +225,6 @@ const downloadFile = () => {
           item.minPrice === item.maxPrice
             ? item.minPrice / 100
             : item.minPrice / 100 + ' ~ ' + item.maxPrice / 100
-        item.oldPrice = item.oldPrice / 100
         item.status = item.status ? '上架' : '下架'
         return item
       })
@@ -241,7 +234,6 @@ const downloadFile = () => {
         '名称',
         '单位',
         '价格',
-        '原价',
         '排列序号',
         '购物须知',
         '状态',
@@ -251,7 +243,6 @@ const downloadFile = () => {
         'name',
         'unit',
         'price',
-        'oldPrice',
         'sort',
         'sketch',
         'status',

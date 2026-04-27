@@ -23,8 +23,8 @@
         </el-form-item>
       </el-col> -->
       <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6" class="mb20">
-        <el-form-item label="打包费" prop="packingFee">
-          <el-input v-model="formData.packingFee" placeholder="请输入打包费" clearable></el-input>
+        <el-form-item label="价格" prop="price">
+          <el-input v-model="formData.price" placeholder="请输入价格" clearable></el-input>
         </el-form-item>
       </el-col>
       <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6" class="mb20">
@@ -35,11 +35,6 @@
       <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6" class="mb20">
         <el-form-item label="排列序号" prop="sort">
           <el-input v-model="formData.sort" placeholder="请输入排列序号" clearable></el-input>
-        </el-form-item>
-      </el-col>
-      <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6" class="mb20">
-        <el-form-item label="虚拟销量" prop="virtualAmount">
-          <el-input v-model="formData.virtualAmount" placeholder="请输入虚拟销量" clearable></el-input>
         </el-form-item>
       </el-col>
       <!-- <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6" class="mb20">
@@ -143,10 +138,8 @@ const state = reactive({
     stockMode: 1,
     calcBy: 1,
     minOrderAmount: 1,
-    virtualAmount: 0,
-    onlyPos: false,
-    enableMail: false,
-    packingFee: ''
+     packingFee: '',
+    price: ''
   } as any,
   unitList: [
     {
@@ -255,10 +248,9 @@ const initFormData = (val: any) => {
     stockMode: val.stockMode,
     calcBy: val.calcBy,
     minOrderAmount: val.minOrderAmount,
-    virtualAmount: val.virtualAmount || 0,
-    onlyPos: val.onlyPos,
     enableMail: val.enableMail,
-    packingFee: val.packingFee
+    packingFee: val.packingFee,
+    price: val.price
   }
 }
 

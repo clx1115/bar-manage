@@ -180,8 +180,19 @@ const onSubmit = () => {
       }
     }
   }
+  // 统一处理价格，转为分
+  if (formData.price) {
+    const priceCents = Math.round(Number(formData.price) * 100)
+    if (!isNaN(priceCents)) {
+      formData.price = priceCents
+      if (formData.attrType === 1) {
+        formData.minPrice = priceCents
+        formData.maxPrice = priceCents
+        formData.simpleProudct.price = priceCents
+      }
+    }
+  }
   formData.sort = formData.sort || 1
-  formData.packingFee = Math.round(formData.packingFee * 100)
   if (!formData.name) {
     return ElMessage({
       message: '请填写商品名称',
