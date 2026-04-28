@@ -457,7 +457,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
         component: () => import('@/layout/routerView/parent.vue'),
         redirect: '/freebie/config',
         meta: {
-          title: '免费礼品',
+          title: '免费',
           isLink: '',
           isHide: false,
           isKeepAlive: true,
@@ -520,7 +520,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
         component: () => import('@/layout/routerView/parent.vue'),
         redirect: '/captain/audit',
         meta: {
-          title: '团长分利',
+          title: '团长',
           isLink: '',
           isHide: false,
           isKeepAlive: true,
