@@ -1,48 +1,39 @@
 import request from '@/utils/request'
 
-//获取桌码列表
-export function getTableList(data: any) {
+export function getAreaTableList(data: any) {
   return request({
-    url: '/v1/shop/shop_table_list/',
+    url: '/v1/shop/area_table_list/',
+    method: 'post',
+    data,
+  })
+}
+
+export function getAreaTableDetail(id: number | string) {
+  return request({
+    url: `/v1/shop/area_table/${id}/`,
     method: 'get',
-    params: data,
   })
 }
 
-//生成桌码
-export function generateTable(data: any) {
+export function addAreaTable(data: any) {
   return request({
-    url: '/v1/shop/generate_shop_table/',
+    url: '/v1/shop/area_table/new/',
     method: 'post',
     data,
   })
 }
 
-//修改桌码状态
-export function modStatus(data: any) {
+export function updateAreaTable(id: number | string, data: any) {
   return request({
-    url: '/v1/shop/shop_table/' + data.id + '/',
+    url: `/v1/shop/area_table/${id}/`,
     method: 'post',
     data,
   })
 }
 
-//删除桌码
-export function delTable(data: any) {
+export function deleteAreaTable(data: { ids: Array<number | string> }) {
   return request({
-    url: '/v1/shop/shop_table/',
-    method: 'post',
-    data: {
-      id: data.id,
-      operation: 'del',
-    },
-  })
-}
-
-//刷新桌码
-export function refreshTable(data: any) {
-  return request({
-    url: '/v1/shop/refresh_table_barcode/' + data.id + '/',
+    url: '/v1/shop/area_table/delete/',
     method: 'post',
     data,
   })

@@ -16,7 +16,7 @@
 ### 01 01商户登录
 ### Method: login
 ### HTTP: POST /v1/shop/login/noauth/
-### Note: @api Javadoc still写着 /v1/s/login/noauth/，实际路由以 conf/routes 为准。
+### Note: @api Javadoc still写着 /v1/shop/login/noauth/，实际路由以 conf/routes 为准。
 ### Description: 管理员登录，成功后返回 token。
 ### Request body:
 ### - username: 登录用户名，通常是手机号或账号名
