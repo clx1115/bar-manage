@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getTabList(params?: object) {
   return request({
-    url: '/v2/shop/product_tabs/',
+    url: '/v1/shop/product_tabs/',
     method: 'get',
     params: params,
   })
@@ -16,7 +16,7 @@ export function getTabList(params?: object) {
  */
 export function getTabDetail(data: any) {
   return request({
-    url: `/v2/shop/product_tabs/${data.id}/`,
+    url: `/v1/shop/product_tabs/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -27,7 +27,7 @@ export function getTabDetail(data: any) {
  */
 export function addTab(data: object) {
   return request({
-    url: '/v2/shop/product_tab/new/',
+    url: '/v1/shop/product_tab/new/',
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function addTab(data: object) {
  */
 export function updateTab(data: any) {
   return request({
-    url: `/v2/shop/product_tab/${data.id}/`,
+    url: `/v1/shop/product_tab/${data.id}/`,
     method: 'post',
     data,
   })
@@ -47,7 +47,7 @@ export function updateTab(data: any) {
 //删除TAB
 export function delTab(data: any) {
   return request({
-    url: '/v2/shop/product_tab/',
+    url: '/v1/shop/product_tab/',
     method: 'post',
     data: {
       id: data.id,

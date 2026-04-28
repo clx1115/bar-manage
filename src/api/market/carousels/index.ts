@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getCarouselsList(data: any) {
   return request({
-    url: '/v2/shop/carousels_list/',
+    url: '/v1/shop/carousels_list/',
     method: 'post',
     data
   })
@@ -16,7 +16,7 @@ export function getCarouselsList(data: any) {
  */
 export function getCarouselsDetail(data: any) {
   return request({
-    url: `/v2/shop/carousels/${data.id}/`,
+    url: `/v1/shop/carousels/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -27,7 +27,7 @@ export function getCarouselsDetail(data: any) {
  */
 export function addCarousels(data: any) {
   return request({
-    url: '/v2/shop/carousels/new/',
+    url: '/v1/shop/carousels/new/',
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function addCarousels(data: any) {
  */
 export function updateCarousels(data: any) {
   return request({
-    url: `/v2/shop/carousels/${data.id}/`,
+    url: `/v1/shop/carousels/${data.id}/`,
     method: 'post',
     data,
   })
@@ -47,7 +47,7 @@ export function updateCarousels(data: any) {
 //删除轮播图
 export function delCarousels(data: any) {
   return request({
-    url: '/v2/shop/carousels/',
+    url: '/v1/shop/carousels/',
     method: 'post',
     data: {
       id: data.id,

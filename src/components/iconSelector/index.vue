@@ -177,7 +177,7 @@ const initFontIconData = async (name: string) => {
     })
   }
   // 初始化 input 的 placeholder
-  // 参考（单项数据流）：https://cn.vuejs.org/v2/guide/components-props.html?#%E5%8D%95%E5%90%91%E6%95%B0%E6%8D%AE%E6%B5%81
+  // 参考（单项数据流）：https://cn.vuejs.org/v1/guide/components-props.html?#%E5%8D%95%E5%90%91%E6%95%B0%E6%8D%AE%E6%B5%81
   state.fontIconPlaceholder = props.placeholder
   // 初始化双向绑定回显
   initModeValueEcho()

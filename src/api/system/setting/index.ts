@@ -3,7 +3,7 @@ import request from '@/utils/request'
 //获取商品统一图片
 export function getProductImg() {
   return request({
-    url: '/v2/shop/product_uni_image/',
+    url: '/v1/shop/product_uni_image/',
     method: 'get',
     params: {},
   })
@@ -13,7 +13,7 @@ export function getProductImg() {
 //保存商品统一图片
 export function setProductImg(data: any) {
   return request({
-    url: '/v2/shop/product_uni_image/',
+    url: '/v1/shop/product_uni_image/',
     method: 'post',
     params: data,
   })
@@ -23,7 +23,7 @@ export function setProductImg(data: any) {
 //店铺退货默认地址详情
 export function getAddress() {
   return request({
-    url: '/v2/shop/shop_return_contact_detail/',
+    url: '/v1/shop/shop_return_contact_detail/',
     method: 'get',
   })
 }
@@ -31,7 +31,7 @@ export function getAddress() {
 //店铺退货默认地址详情
 export function updateAddress(data: any) {
   return request({
-    url: '/v2/shop/shop_return_contact_detail/',
+    url: '/v1/shop/shop_return_contact_detail/',
     method: 'post',
     data,
   })
@@ -40,7 +40,7 @@ export function updateAddress(data: any) {
 //获取商家信息
 export function getOrgInfo() {
   return request({
-    url: '/v2/shop/org_param/',
+    url: '/v1/shop/org_param/',
     method: 'get',
   })
 }
@@ -48,7 +48,7 @@ export function getOrgInfo() {
 //更新商家信息
 export function updateOrgInfo(data: any) {
   return request({
-    url: '/v2/shop/org_param/',
+    url: '/v1/shop/org_param/',
     method: 'post',
     data,
   })

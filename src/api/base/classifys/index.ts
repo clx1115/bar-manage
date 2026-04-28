@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getClassifysList(params?: object) {
   return request({
-    url: '/v2/shop/classifys/',
+    url: '/v1/shop/classifys/',
     method: 'get',
     params: params,
   })
@@ -16,7 +16,7 @@ export function getClassifysList(params?: object) {
  */
 export function getClassifysDetail(data: any) {
   return request({
-    url: `/v2/shop/classifys/${data.id}/`,
+    url: `/v1/shop/classifys/${data.id}/`,
     method: 'get',
     data
   })
@@ -27,7 +27,7 @@ export function getClassifysDetail(data: any) {
  */
 export function addClassifys(data: object) {
   return request({
-    url: '/v2/shop/classify/new/',
+    url: '/v1/shop/classify/new/',
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function addClassifys(data: object) {
  */
 export function updateClassifys(data: any) {
   return request({
-    url: `/v2/shop/classify/${data.id}/`,
+    url: `/v1/shop/classify/${data.id}/`,
     method: 'post',
     data,
     
@@ -48,7 +48,7 @@ export function updateClassifys(data: any) {
 //删除归集
 export function delClassifys(data: any) {
   return request({
-    url: '/v2/shop/classify/',
+    url: '/v1/shop/classify/',
     method: 'post',
     data: {
       id: data.id,

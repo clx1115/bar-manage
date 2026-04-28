@@ -3,7 +3,7 @@ import request from '@/utils/request'
 //获取店铺列表
 export function getShopList(data: any) {
   return request({
-    url: '/v2/shop/shops/',
+    url: '/v1/shop/shops/',
     method: 'post',
     data,
   })
@@ -12,7 +12,7 @@ export function getShopList(data: any) {
 //获取店铺详情
 export function getShopDetail(data: any) {
   return request({
-    url: `/v2/shop/shop/${data.id}/`,
+    url: `/v1/shop/shop/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -21,7 +21,7 @@ export function getShopDetail(data: any) {
 //添加店铺
 export function addShop(data: object) {
   return request({
-    url: '/v2/shop/shop/new/',
+    url: '/v1/shop/shop/new/',
     method: 'post',
     data,
   })
@@ -30,7 +30,7 @@ export function addShop(data: object) {
 //更新店铺
 export function updateShop(data: any) {
   return request({
-    url: `/v2/shop/shop/${data.id}/`,
+    url: `/v1/shop/shop/${data.id}/`,
     method: 'post',
     data,
   })
@@ -39,7 +39,7 @@ export function updateShop(data: any) {
 //删除店铺
 export function deleteShop(data: any) {
   return request({
-    url: '/v2/shop/shop/',
+    url: '/v1/shop/shop/',
     method: 'post',
     data: { id: data.id, operation: 'del' },
   })
@@ -49,7 +49,7 @@ export function deleteShop(data: any) {
 //生成auth token
 export function generateAuth(data: any) {
   return request({
-    url: '/v2/shop/auth_sec/',
+    url: '/v1/shop/auth_sec/',
     method: 'post',
     data,
   })

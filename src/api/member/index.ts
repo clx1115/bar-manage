@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getMemberList(data: object) {
   return request({
-    url: '/v2/shop/members/',
+    url: '/v1/shop/members/',
     method: 'post',
     data,
   })
@@ -16,7 +16,7 @@ export function getMemberList(data: object) {
  */
 export function getMemberDetail(data: any) {
   return request({
-    url: `/v2/shop/members/${data.id}/`,
+    url: `/v1/shop/members/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -25,7 +25,7 @@ export function getMemberDetail(data: any) {
 //锁定/解锁用户
 export function setMemberStatus(data: any) {
   return request({
-    url: '/v2/shop/members/status/',
+    url: '/v1/shop/members/status/',
     method: 'post',
     data,
   })
@@ -34,7 +34,7 @@ export function setMemberStatus(data: any) {
 //获得用户流水记录
 export function getMemberBalance(data: any) {
   return request({
-    url: '/v2/shop/members/status/',
+    url: '/v1/shop/members/status/',
     method: 'post',
     data,
   })
@@ -42,7 +42,7 @@ export function getMemberBalance(data: any) {
 //获得用户订单
 export function getMemberOrder(data: any) {
   return request({
-    url: '/v2/shop/customer_orders/',
+    url: '/v1/shop/customer_orders/',
     method: 'get',
     data,
   })
@@ -50,7 +50,7 @@ export function getMemberOrder(data: any) {
 //修改用户详情
 export function updateMember(data: any) {
   return request({
-    url: `/v2/shop/members/${data.id}/`,
+    url: `/v1/shop/members/${data.id}/`,
     method: 'post',
     data,
   })
@@ -58,7 +58,7 @@ export function updateMember(data: any) {
 //充值/扣款
 export function updateBalance(data: any) {
   return request({
-    url: '/v2/shop/member_balance/',
+    url: '/v1/shop/member_balance/',
     method: 'post',
     data,
   })
@@ -67,7 +67,7 @@ export function updateBalance(data: any) {
 // 添加会员等级
 export function addMemberLevel(data: any) {
   return request({
-    url: '/v2/shop/member_level/new/',
+    url: '/v1/shop/member_level/new/',
     method: 'post',
     data,
   })
@@ -76,7 +76,7 @@ export function addMemberLevel(data: any) {
 // 用户等级列表
 export function getLevelList(data: any) {
   return request({
-    url: '/v2/shop/member_level_list/',
+    url: '/v1/shop/member_level_list/',
     method: 'get',
     data,
   })
@@ -85,7 +85,7 @@ export function getLevelList(data: any) {
 // 更新用户等级配置
 export function updataMemberLevel(data: any) {
   return request({
-    url: `/v2/shop/member_level/${data.id}/`,
+    url: `/v1/shop/member_level/${data.id}/`,
     method: 'post',
     data,
   })
@@ -94,7 +94,7 @@ export function updataMemberLevel(data: any) {
 // 用户等级配置 详情
 export function getMemberLevel(data: any) {
   return request({
-    url: `/v2/shop/member_level/${data.id}/`,
+    url: `/v1/shop/member_level/${data.id}/`,
     method: 'get',
     data,
   })
@@ -103,7 +103,7 @@ export function getMemberLevel(data: any) {
 // 删除用户等级配置
 export function delMemberLevel(data: any) {
   return request({
-    url: `/v2/shop/member_level/`,
+    url: `/v1/shop/member_level/`,
     method: 'post',
     data,
   })
@@ -113,7 +113,7 @@ export function delMemberLevel(data: any) {
 //获取业务员客户记录
 export function getDealerCustomersList(data: any) {
   return request({
-    url: '/v2/shop/dealer_customers/',
+    url: '/v1/shop/dealer_customers/',
     method: 'post',
     data,
   })
@@ -122,7 +122,7 @@ export function getDealerCustomersList(data: any) {
 //获取业务员客户订单列表
 export function getDealerCustomersOrder(data: any) {
   return request({
-    url: '/v2/shop/customer_orders/',
+    url: '/v1/shop/customer_orders/',
     method: 'get',
     params: data,
   })
@@ -132,7 +132,7 @@ export function getDealerCustomersOrder(data: any) {
 //生成用户宣传二维码
 export function generateBarcode(data: any) {
   return request({
-    url: '/v2/shop/member_barcode/',
+    url: '/v1/shop/member_barcode/',
     method: 'get',
     params: data,
   })
@@ -142,7 +142,7 @@ export function generateBarcode(data: any) {
 //寄存列表
 export function getPlaceList(data: any) {
   return request({
-    url: '/v2/shop/pos/storage_list/',
+    url: '/v1/shop/pos/storage_list/',
     method: 'post',
     data
   })
@@ -151,7 +151,7 @@ export function getPlaceList(data: any) {
 //寄存明细
 export function getPlaceLogList(data: any) {
   return request({
-    url: '/v2/shop/pos/storage_log_list/',
+    url: '/v1/shop/pos/storage_log_list/',
     method: 'post',
     data,
   })

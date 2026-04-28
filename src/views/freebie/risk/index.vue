@@ -237,8 +237,8 @@ const formatDuration = (duration: number) => {
   return `${Math.floor(duration / 60000)}分钟`
 }
 
-const checkStatus = async (targetMemberId?: number) => {
-  const memberValue = targetMemberId || currentMemberId.value
+const checkStatus = async (targetMemberId?: number | Event) => {
+  const memberValue = typeof targetMemberId === 'number' ? targetMemberId : currentMemberId.value
   if (!memberValue) {
     ElMessage.warning('请输入会员ID')
     return
@@ -250,7 +250,7 @@ const checkStatus = async (targetMemberId?: number) => {
     })
     state.statusInfo = {
       memberId: memberValue,
-      isBanned: !!data.isBanned,
+      isBanned: typeof data.banned === 'boolean' ? data.banned : !!data.isBanned,
       banExpireTime: data.banExpireTime,
       reason: data.reason,
     }

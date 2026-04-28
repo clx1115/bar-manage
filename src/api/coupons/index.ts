@@ -3,7 +3,7 @@ import request from '@/utils/request'
 //获取优惠券配置列表
 export function getCouponsList(params: object) {
   return request({
-    url: '/v2/shop/shop_coupon_config_list/',
+    url: '/v1/shop/shop_coupon_config_list/',
     method: 'get',
     params: params,
   })
@@ -12,7 +12,7 @@ export function getCouponsList(params: object) {
 //获取优惠券详情
 export function getCouponsDetail(data: any) {
   return request({
-    url: `/v2/shop/shop_coupon_config/${data.id}/`,
+    url: `/v1/shop/shop_coupon_config/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -21,7 +21,7 @@ export function getCouponsDetail(data: any) {
 //添加优惠券
 export function addCoupons(data: object) {
   return request({
-    url: '/v2/shop/shop_coupon_config/new/',
+    url: '/v1/shop/shop_coupon_config/new/',
     method: 'post',
     data,
   })
@@ -30,7 +30,7 @@ export function addCoupons(data: object) {
 //更新优惠券
 export function updateCoupons(data: any) {
   return request({
-    url: `/v2/shop/shop_coupon_config/${data.id}/`,
+    url: `/v1/shop/shop_coupon_config/${data.id}/`,
     method: 'post',
     data,
   })
@@ -39,7 +39,7 @@ export function updateCoupons(data: any) {
 //删除优惠券
 export function delCoupons(data: any) {
   return request({
-    url: '/v2/shop/shop_coupon_config/',
+    url: '/v1/shop/shop_coupon_config/',
     method: 'post',
     data: {
       id: data.id,
@@ -51,7 +51,7 @@ export function delCoupons(data: any) {
 //用户领取优惠券
 export function userCouponsRecord(data: any) {
   return request({
-    url: `/v2/shop/shop_member_coupons/`,
+    url: `/v1/shop/shop_member_coupons/`,
     method: 'post',
     data,
   })
@@ -61,7 +61,7 @@ export function userCouponsRecord(data: any) {
  */
 export function batchGrantCoupons(data: any) {
   return request({
-    url: '/v2/shop/shop_batch_give_member_coupons/',
+    url: '/v1/shop/shop_batch_give_member_coupons/',
     method: 'post',
     data,
   })

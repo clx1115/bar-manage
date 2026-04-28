@@ -3,7 +3,7 @@ import request from '@/utils/request'
 //获取桌码列表
 export function getTableList(data: any) {
   return request({
-    url: '/v2/shop/shop_table_list/',
+    url: '/v1/shop/shop_table_list/',
     method: 'get',
     params: data,
   })
@@ -12,7 +12,7 @@ export function getTableList(data: any) {
 //生成桌码
 export function generateTable(data: any) {
   return request({
-    url: '/v2/shop/generate_shop_table/',
+    url: '/v1/shop/generate_shop_table/',
     method: 'post',
     data,
   })
@@ -21,7 +21,7 @@ export function generateTable(data: any) {
 //修改桌码状态
 export function modStatus(data: any) {
   return request({
-    url: '/v2/shop/shop_table/' + data.id + '/',
+    url: '/v1/shop/shop_table/' + data.id + '/',
     method: 'post',
     data,
   })
@@ -30,7 +30,7 @@ export function modStatus(data: any) {
 //删除桌码
 export function delTable(data: any) {
   return request({
-    url: '/v2/shop/shop_table/',
+    url: '/v1/shop/shop_table/',
     method: 'post',
     data: {
       id: data.id,
@@ -42,7 +42,7 @@ export function delTable(data: any) {
 //刷新桌码
 export function refreshTable(data: any) {
   return request({
-    url: '/v2/shop/refresh_table_barcode/' + data.id + '/',
+    url: '/v1/shop/refresh_table_barcode/' + data.id + '/',
     method: 'post',
     data,
   })

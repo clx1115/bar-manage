@@ -25,40 +25,46 @@
         </el-row>
         <el-row>
           <el-form-item>
-            <el-input v-model="queryData.orderNo" size="default" placeholder="订单编号" style="width:120px" clearable>
-            </el-input>
+            <el-input v-model="queryData.orderNo" size="default" placeholder="订单编号" style="width: 140px" clearable />
           </el-form-item>
           <el-form-item>
-            <el-input v-model="queryData.uid" size="default" placeholder="用户UID" style="width:100px" clearable>
-            </el-input>
+            <el-input v-model="queryData.uid" size="default" placeholder="用户UID" style="width: 120px" clearable />
           </el-form-item>
           <el-form-item>
-            <el-input v-model="queryData.userName" size="default" placeholder="用户名称" style="width:120px" clearable> </el-input>
+            <el-input v-model="queryData.userName" size="default" placeholder="用户名称" style="width: 140px" clearable />
           </el-form-item>
           <el-form-item>
-            <el-input v-model="queryData.phoneNumber" size="default" placeholder="用户手机号码" style="width:120px" clearable>
-            </el-input>
+            <el-input v-model="queryData.phoneNumber" size="default" placeholder="收货手机号" style="width: 140px" clearable />
           </el-form-item>
           <el-form-item>
-            <el-select v-model="queryData.source" size="default" placeholder="订单来源" clearable style="width:100px">
-              <el-option label="全部" :value="0" />
-              <el-option label="门店" :value="1" />
-              <el-option label="小程序" :value="2" />
-            </el-select>
+            <el-input v-model="queryData.pickupCode" size="default" placeholder="取餐码" style="width: 120px" clearable />
           </el-form-item>
           <el-form-item>
-            <el-select v-model="queryData.shopId" placeholder="选择店铺" filterable clearable style="width:130px">
-              <el-option v-for="item in shopList" :key="item.id" :label="item.name" :value="item.id" />
-            </el-select>
+            <el-input v-model="queryData.filter" size="default" placeholder="综合搜索" style="width: 160px" clearable />
           </el-form-item>
           <el-form-item>
-            <el-select v-model="queryData.payMethod" size="default" placeholder="支付方式" clearable style="width:130px">
-              <el-option label="全部" :value="0" />
-              <el-option v-for="item in payMethodList" :key="item.id" :label="item.name" :value="item.attrValue" />
-            </el-select>
+            <el-date-picker
+              v-model="timeRange"
+              size="default"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="下单开始时间"
+              end-placeholder="下单结束时间"
+              format="YYYY-MM-DD"
+              value-format="x"
+            />
           </el-form-item>
           <el-form-item>
-            <el-date-picker size="default" v-model="timeRange" type="daterange" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" format="YYYY-MM-DD" value-format="x" />
+            <el-date-picker
+              v-model="scheduleTimeRange"
+              size="default"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="预约开始时间"
+              end-placeholder="预约结束时间"
+              format="YYYY-MM-DD"
+              value-format="x"
+            />
           </el-form-item>
           <el-form-item>
             <el-button size="default" type="primary" @click="getListData">
@@ -132,19 +138,16 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column prop="orderNo" label="订单编号" min-width="180" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="orderNo" label="订单编号" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="orgName" label="店铺名称" min-width="160" show-overflow-tooltip />
         <el-table-column label="用户信息" show-overflow-tooltip width="180">
           <template #default="{ row }">
             <span v-if="row.uid">{{ row.userName }}(UID:{{ row.uid }})</span>
             <span v-else>--</span>
           </template>
         </el-table-column>
-        <el-table-column label="订单来源" width="120">
-          <template #default="{ row }">
-            {{ formatOrderSource(row.source) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="productCount" label="商品数量" width="100"></el-table-column>
+        <el-table-column prop="pickupCode" label="取餐码" width="120" show-overflow-tooltip />
+        <el-table-column prop="productCount" label="商品数量" width="100" />
         <el-table-column label="订单总额" width="100">
           <template #default="{ row }">
             {{ parseMoney(row.totalMoney) }}
@@ -170,7 +173,7 @@
             {{ formatAfterSalesStatus(row.postServiceStatus) }}
           </template>
         </el-table-column>
-        <el-table-column prop="payMethodName" label="支付方式" width="100"></el-table-column>
+        <el-table-column prop="payMethodName" label="支付方式" width="120" />
         <el-table-column label="下单时间" width="200">
           <template #default="{ row }">
             {{ formatDate(row.createTime, 'YYYY-mm-dd HH:MM:SS') }}
@@ -197,7 +200,7 @@
 </template>
 <script lang="ts">
 export default {
-  name: "orderIndex",
+  name: 'orderIndex',
   beforeRouteEnter(to, from, next) {
     next((vm: any) => {
       if (from.name === 'orderDetail') {
@@ -218,10 +221,8 @@ import {
   watch,
 } from 'vue'
 import { formatDate } from '@/utils/formatTime'
-import { getOrderList, cancelOrder, batchOrderDelievered, getOrderCount, getPrintTemplate } from '@/api/order/index'
-import { getShopList } from '@/api/shop/index'
-import { getPayMethodList } from '@/api/system/payMethod/index'
-import { formatDeliveryType, formatOrderSource } from '@/dict/order'
+import { listOrders, cancelOrder, batchOrderDelievered, getOrderCount, getPrintTemplate } from '@/api/order/index'
+import { formatDeliveryType } from '@/dict/order'
 import { formatOrderStatus, parseMoney, formatAfterSalesStatus } from '@/utils/filters'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
@@ -230,88 +231,120 @@ import { useUserInfo } from '@/stores/userInfo'
 const stores = useUserInfo()
 const { userInfos } = storeToRefs(stores) as any
 
-// 引入组件
 const printOrder = defineAsyncComponent(
   () => import('./component/print.vue')
 )
 
-// 定义变量
 const defaultQuery = {
   status: 0,
   orderNo: '',
   uid: '',
   userName: '',
   phoneNumber: '',
-  orderType: '',
+  pickupCode: '',
   beginTime: 0,
   endTime: 0,
-  dealerUid: '',
-  payMethod: 0,
-  shopId: '',
-  source: 0
+  scheduleBeginTime: 0,
+  scheduleEndTime: 0,
+  filter: '',
 }
+
 const beginTime = new Date(new Date().toLocaleDateString()).getTime()
 const timeRange = ref([beginTime, beginTime])
+const scheduleTimeRange = ref([] as number[])
 const printOrderRef = ref()
 const state = reactive({
-  list: [],
+  list: [] as any[],
   loading: false,
   currentPage: 1,
   totalPage: 1,
   queryData: Object.assign({}, defaultQuery),
-  submitData: {},
+  submitData: Object.assign({}, defaultQuery),
   exportLoading: false,
-  selectedList: [],
+  selectedList: [] as any[],
   count: {} as any,
-  shopList: [] as any,
-  payMethodList: [] as any,
   printTemplate: ''
 })
 
-const { list, loading, currentPage, totalPage, queryData, exportLoading, selectedList, count, shopList, payMethodList } =
+const { list, loading, currentPage, totalPage, queryData, exportLoading, selectedList, count } =
   toRefs(state)
 
 watch(timeRange, (newValue: any) => {
   if (newValue && newValue[0] && newValue[1]) {
-    state.queryData.beginTime = newValue[0] / 1000 || 0
-    state.queryData.endTime =
-      (newValue[1] + 24 * 60 * 60 * 1000 - 1000) / 1000 || 0
+    state.queryData.beginTime = newValue[0] || 0
+    state.queryData.endTime = newValue[1] + 24 * 60 * 60 * 1000 - 1000 || 0
   } else {
     state.queryData.beginTime = 0
     state.queryData.endTime = 0
   }
-},
-  {
-    immediate: true,
-  })
+}, {
+  immediate: true,
+})
 
-// 获取列表
+watch(scheduleTimeRange, (newValue: any) => {
+  if (newValue && newValue[0] && newValue[1]) {
+    state.queryData.scheduleBeginTime = newValue[0] || 0
+    state.queryData.scheduleEndTime = newValue[1] + 24 * 60 * 60 * 1000 - 1000 || 0
+  } else {
+    state.queryData.scheduleBeginTime = 0
+    state.queryData.scheduleEndTime = 0
+  }
+}, {
+  immediate: true,
+})
+
+const normalizeOrderItem = (item: any) => ({
+  ...item,
+  orgName: item.orgName ?? item.shopName ?? '',
+  createTime: item.createTime ?? item.createdTime ?? 0,
+  updateTime: item.updateTime ?? item.updatedTime ?? 0,
+  detailList: Array.isArray(item.detailList) ? item.detailList : [],
+  pickupCode: item.pickupCode ?? '',
+})
+
+const buildOrderQuery = (page: number, source = state.queryData) => {
+  const payload = {
+    page,
+  } as any
+
+  if (source.orderNo) payload.orderNo = source.orderNo
+  if (source.userName) payload.userName = source.userName
+  if (source.phoneNumber) payload.phoneNumber = source.phoneNumber
+  if (source.uid !== '') payload.uid = source.uid
+  if (source.status) payload.status = source.status
+  if (source.pickupCode) payload.pickupCode = source.pickupCode
+  if (source.beginTime > 0) payload.beginTime = source.beginTime
+  if (source.endTime > 0) payload.endTime = source.endTime
+  if (source.scheduleBeginTime > 0) payload.scheduleBeginTime = source.scheduleBeginTime
+  if (source.scheduleEndTime > 0) payload.scheduleEndTime = source.scheduleEndTime
+  if (source.filter) payload.filter = source.filter
+
+  return payload
+}
+
 const getListData = () => {
   state.loading = true
   if (JSON.stringify(state.queryData) !== JSON.stringify(state.submitData)) {
     state.currentPage = 1
   }
-  const formData = JSON.parse(JSON.stringify(state.queryData))
-  getOrderList({
-    page: state.currentPage,
-    ...formData,
-  }).then((data: any) => {
-    state.loading = false
-    state.list = data.list
-    if (state.currentPage === 1 && data.pages > 0) {
-      state.totalPage = data.pages
-    }
-    state.submitData = JSON.parse(JSON.stringify(state.queryData))
-  })
+
+  listOrders(buildOrderQuery(state.currentPage))
+    .then((data: any) => {
+      state.list = (data.list || []).map((item: any) => normalizeOrderItem(item))
+      state.totalPage = state.currentPage === 1 ? (data.pages || 1) : state.totalPage
+      state.submitData = JSON.parse(JSON.stringify(state.queryData))
+    })
+    .finally(() => {
+      state.loading = false
+    })
 }
 
-// 获取订单状态数量
 const getOrderCountData = () => {
   getOrderCount().then((data: any) => {
     state.count = data
   })
 }
-// 获取打印模板ID
+
 const getPrintTemplateData = () => {
   getPrintTemplate({ page: 1 }).then((data: any) => {
     const printTemplateData = data.list.find((item: any) => item.title === '销售出库单')
@@ -321,24 +354,6 @@ const getPrintTemplateData = () => {
   })
 }
 
-// 获取店铺列表
-const getShopListData = () => {
-  getShopList({
-    page: 0
-  }).then((data: any) => {
-    state.shopList = data.list
-  })
-}
-
-// 获取支付方式列表
-const getPayMethodListData = () => {
-  state.loading = true
-  getPayMethodList().then((data: any) => {
-    state.payMethodList = data.list
-  })
-}
-
-//订单打印
 const onPrintOrder = (row: any) => {
   if (!state.printTemplate) {
     return ElMessage.warning('暂无打印模板')
@@ -346,14 +361,12 @@ const onPrintOrder = (row: any) => {
   printOrderRef.value.printOrder(state.printTemplate, row.id)
 }
 
-//重置搜索条件
 const refreshQuery = () => {
   state.queryData = Object.assign({}, defaultQuery)
-  const beginTime = new Date(new Date().toLocaleDateString()).getTime()
   timeRange.value = [beginTime, beginTime]
+  scheduleTimeRange.value = []
   getListData()
 }
-
 
 const handleSizeChange = () => {
   getListData()
@@ -363,10 +376,9 @@ const handleCurrentChange = () => {
   getListData()
 }
 
-//取消订单
 const onCancelOrder = (row: any) => {
   ElMessageBox.confirm(
-    `您正在取消订单，是否继续?`,
+    '您正在取消订单，是否继续?',
     '提示',
     {
       confirmButtonText: '确认',
@@ -384,10 +396,9 @@ const onCancelOrder = (row: any) => {
     .catch(() => { })
 }
 
-// 批量发货
 const onBatchOrderDelievered = () => {
   ElMessageBox.confirm(
-    `您正在操作批量发货订单，是否继续?`,
+    '您正在操作批量发货订单，是否继续?',
     '提示',
     {
       confirmButtonText: '确认',
@@ -396,7 +407,7 @@ const onBatchOrderDelievered = () => {
     }
   )
     .then(() => {
-      const list = [] as any
+      const list = [] as any[]
       state.selectedList.forEach((item: any) => {
         list.push({
           orderId: item.id,
@@ -405,7 +416,7 @@ const onBatchOrderDelievered = () => {
         })
       })
       batchOrderDelievered({
-        list: list,
+        list,
       }).then(() => {
         getListData()
         getOrderCountData()
@@ -413,104 +424,116 @@ const onBatchOrderDelievered = () => {
       })
     })
     .catch(() => { })
-
 }
 
-//导出表格
 const downloadFile = () => {
   import('@/utils/export.js').then((excel) => {
     state.exportLoading = true
-    getOrderList({ page: 0, ...state.submitData }).then((data) => {
-      const tableData = data.list.map((item: any) => {
-        item.totalMoney = Number(item.totalMoney / 100)
-        item.realPay = Number(item.realPay / 100)
-        item.profit = Number(item.profit / 100)
-        item.createTime = formatDate(item.createTime, 'YYYY-mm-dd HH:MM:SS')
-        item.status = formatOrderStatus(item.status)
-        return item
-      })
-      let t = tableData.length
-      for (let i = 0;i < t;i++) {
-        const arr = tableData
-        const item = arr[i]
-        if (!item.id) continue
-        item.detailList.forEach((detailItem: any, detailIndex: number) => {
-          if (!detailIndex) {
-            item.productId = detailItem.productId
-            item.productName = detailItem.productName
-            item.productPrice = parseMoney(detailItem.productPrice)
-            item.number = detailItem.number
-            item.resultPrice = parseMoney(detailItem.resultPrice)
-            item.subTotal = parseMoney(detailItem.subTotal)
-          } else {
-            arr.splice(i + 1, 0, {
-              productId: detailItem.productId,
-              productName: detailItem.productName,
-              productPrice: parseMoney(detailItem.productPrice),
-              number: detailItem.number,
-              resultPrice: parseMoney(detailItem.resultPrice),
-              subTotal: parseMoney(detailItem.subTotal),
-            })
-            t = arr.length
-          }
+    listOrders(buildOrderQuery(0, state.submitData))
+      .then((data: any) => {
+        const tableData = (data.list || []).map((rawItem: any) => {
+          const item = normalizeOrderItem(rawItem)
+          item.totalMoney = Number(item.totalMoney / 100)
+          item.realPay = Number(item.realPay / 100)
+          item.createTime = formatDate(item.createTime, 'YYYY-mm-dd HH:MM:SS')
+          item.status = formatOrderStatus(item.status)
+          return item
         })
-      }
-      const exportJsonToExcel = excel.export_json_to_excel
-      const tableHead = [
-        '订单号',
-        '客户UID',
-        '客户名称',
-        '订单总额',
-        '实付总额',
-        '支付方式',
-        '下单时间',
-        '订单状态',
-        '商品ID',
-        '商品名称',
-        '数量',
-        '单价',
-        '结算价',
-        '小计',
-      ]
-      const filterVal = [
-        'orderNo',
-        'uid',
-        'userName',
-        'totalMoney',
-        'realPay',
-        'payMethodName',
-        'createTime',
-        'status',
-        'productId',
-        'productName',
-        'number',
-        'productPrice',
-        'resultPrice',
-        'subTotal',
-      ]
-      console.log(tableData)
-      const tableBody = tableData.map((v: any) => filterVal.map((j) => v[j]))
-      state.exportLoading = false
-      exportJsonToExcel({
-        header: tableHead,
-        data: tableBody,
-        filename: '订单记录',
-        autoWidth: true,
+
+        let length = tableData.length
+        for (let i = 0; i < length; i++) {
+          const arr = tableData
+          const item = arr[i]
+          if (!item.id) continue
+          item.detailList.forEach((detailItem: any, detailIndex: number) => {
+            if (!detailIndex) {
+              item.productId = detailItem.productId
+              item.productName = detailItem.productName
+              item.productPrice = parseMoney(detailItem.productPrice)
+              item.number = detailItem.number
+              item.resultPrice = parseMoney(detailItem.resultPrice)
+              item.subTotal = parseMoney(detailItem.subTotal)
+            } else {
+              arr.splice(i + 1, 0, {
+                orgName: item.orgName,
+                orderNo: item.orderNo,
+                uid: item.uid,
+                userName: item.userName,
+                pickupCode: item.pickupCode,
+                totalMoney: item.totalMoney,
+                realPay: item.realPay,
+                payMethodName: item.payMethodName,
+                createTime: item.createTime,
+                status: item.status,
+                productId: detailItem.productId,
+                productName: detailItem.productName,
+                productPrice: parseMoney(detailItem.productPrice),
+                number: detailItem.number,
+                resultPrice: parseMoney(detailItem.resultPrice),
+                subTotal: parseMoney(detailItem.subTotal),
+              })
+              length = arr.length
+            }
+          })
+        }
+
+        const exportJsonToExcel = excel.export_json_to_excel
+        const tableHead = [
+          '订单号',
+          '店铺名称',
+          '客户UID',
+          '客户名称',
+          '取餐码',
+          '订单总额',
+          '实付总额',
+          '支付方式',
+          '下单时间',
+          '订单状态',
+          '商品ID',
+          '商品名称',
+          '数量',
+          '单价',
+          '结算价',
+          '小计',
+        ]
+        const filterVal = [
+          'orderNo',
+          'orgName',
+          'uid',
+          'userName',
+          'pickupCode',
+          'totalMoney',
+          'realPay',
+          'payMethodName',
+          'createTime',
+          'status',
+          'productId',
+          'productName',
+          'number',
+          'productPrice',
+          'resultPrice',
+          'subTotal',
+        ]
+        const tableBody = tableData.map((v: any) => filterVal.map((j) => v[j]))
+        exportJsonToExcel({
+          header: tableHead,
+          data: tableBody,
+          filename: '订单记录',
+          autoWidth: true,
+        })
       })
-    })
+      .finally(() => {
+        state.exportLoading = false
+      })
   })
 }
 
-// 页面加载时
 onMounted(() => {
   getListData()
   getOrderCountData()
-  getShopListData()
-  getPayMethodListData()
   getPrintTemplateData()
 })
 
-// 暴露变量
 defineExpose({
   getListData,
   getOrderCountData

@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getKeywordList(data?: object) {
   return request({
-    url: '/v2/shop/search_keywords_list/',
+    url: '/v1/shop/search_keywords_list/',
     method: 'post',
     data,
   })
@@ -13,7 +13,7 @@ export function getKeywordList(data?: object) {
 //关键字详情
 export function KeywordDetail(data: any) {
   return request({
-    url: `/v2/shop/search_keywords/${data.id}/`,
+    url: `/v1/shop/search_keywords/${data.id}/`,
     method: 'get',
     data,
   })
@@ -23,7 +23,7 @@ export function KeywordDetail(data: any) {
  */
 export function addKeyword(data: object) {
   return request({
-    url: '/v2/shop/search_keywords/new/',
+    url: '/v1/shop/search_keywords/new/',
     method: 'post',
     data,
   })
@@ -32,7 +32,7 @@ export function addKeyword(data: object) {
 //更新关键字
 export function editKeyword(data: any) {
   return request({
-    url: `/v2/shop/search_keywords/${data.id}/`,
+    url: `/v1/shop/search_keywords/${data.id}/`,
     method: 'post',
     data,
   })
@@ -41,7 +41,7 @@ export function editKeyword(data: any) {
 //删除关键字
 export function delKeyword(data: any) {
   return request({
-    url: '/v2/shop/search_keywords/',
+    url: '/v1/shop/search_keywords/',
     method: 'post',
     data: {
       id: data.id,

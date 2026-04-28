@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getActivityList(data: object) {
   return request({
-    url: '/v2/shop/activity/',
+    url: '/v1/shop/activity/',
     method: 'post',
     data,
   })
@@ -16,7 +16,7 @@ export function getActivityList(data: object) {
  */
 export function getActivityDetail(data: any) {
   return request({
-    url: `/v2/shop/activity/${data.id}/`,
+    url: `/v1/shop/activity/${data.id}/`,
     method: 'get',
     data
   })
@@ -27,7 +27,7 @@ export function getActivityDetail(data: any) {
  */
 export function addActivity(data: object) {
   return request({
-    url: '/v2/shop/activity/new/',
+    url: '/v1/shop/activity/new/',
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function addActivity(data: object) {
  */
 export function updateActivity(data: any) {
   return request({
-    url: `/v2/shop/activity/${data.id}/`,
+    url: `/v1/shop/activity/${data.id}/`,
     method: 'post',
     data,
     
@@ -48,7 +48,7 @@ export function updateActivity(data: any) {
 //删除活动
 export function delActivity(data: any) {
   return request({
-    url: '/v2/shop/activity/',
+    url: '/v1/shop/activity/',
     method: 'post',
     data: {
       id: data.id,

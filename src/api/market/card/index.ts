@@ -3,7 +3,7 @@ import request from '@/utils/request'
 //获取卡券配置列表
 export function getCardList(params: object) {
   return request({
-    url: '/v2/shop/card_coupon_config_list/',
+    url: '/v1/shop/card_coupon_config_list/',
     method: 'get',
     params: params,
   })
@@ -12,7 +12,7 @@ export function getCardList(params: object) {
 //获取卡券详情
 export function getCardDetail(data: any) {
   return request({
-    url: `/v2/shop/card_coupon_config/${data.id}/`,
+    url: `/v1/shop/card_coupon_config/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -21,7 +21,7 @@ export function getCardDetail(data: any) {
 //添加卡券
 export function addCard(data: object) {
   return request({
-    url: '/v2/shop/card_coupon_config/new/',
+    url: '/v1/shop/card_coupon_config/new/',
     method: 'post',
     data,
   })
@@ -30,7 +30,7 @@ export function addCard(data: object) {
 //更新卡券
 export function updateCard(data: any) {
   return request({
-    url: `/v2/shop/card_coupon_config/${data.id}/`,
+    url: `/v1/shop/card_coupon_config/${data.id}/`,
     method: 'post',
     data,
   })
@@ -39,7 +39,7 @@ export function updateCard(data: any) {
 //删除卡券
 export function delCard(data: any) {
   return request({
-    url: '/v2/shop/card_coupon_config/',
+    url: '/v1/shop/card_coupon_config/',
     method: 'post',
     data: {
       id: data.id,
@@ -51,7 +51,7 @@ export function delCard(data: any) {
 //用户卡券
 export function mebmerCardList(data: any) {
   return request({
-    url: `/v2/shop/member_card_coupons/`,
+    url: `/v1/shop/member_card_coupons/`,
     method: 'post',
     data,
   })
@@ -61,7 +61,7 @@ export function mebmerCardList(data: any) {
  */
 export function batchGrantCard(data: any) {
   return request({
-    url: '/v2/shop/batch_add_card_coupons/',
+    url: '/v1/shop/batch_add_card_coupons/',
     method: 'post',
     data,
   })

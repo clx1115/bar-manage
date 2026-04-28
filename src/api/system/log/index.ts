@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getLogList(params?: object) {
   return request({
-    url: '/v2/shop/operation_logs/',
+    url: '/v1/shop/operation_logs/',
     method: 'get',
     params: params,
   })

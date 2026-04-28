@@ -7,8 +7,8 @@
         </el-form-item>
         <el-form-item label="领取类型">
           <el-select v-model="queryData.type" placeholder="全部" clearable style="width: 160px">
-            <el-option label="免费领取" :value="0" />
-            <el-option label="积分兑换" :value="1" />
+            <el-option label="免费领取" :value="1" />
+            <el-option label="积分兑换" :value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="时间范围">
@@ -48,8 +48,8 @@
         <el-table-column prop="phoneNumber" label="手机号" width="140" />
         <el-table-column label="领取类型" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.type === 0 ? 'success' : 'warning'">
-              {{ row.type === 0 ? '免费领取' : '积分兑换' }}
+            <el-tag :type="row.type === 1 ? 'success' : 'warning'">
+              {{ row.type === 1 ? '免费领取' : '积分兑换' }}
             </el-tag>
           </template>
         </el-table-column>

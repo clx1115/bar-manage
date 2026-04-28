@@ -3,7 +3,7 @@ import request from '@/utils/request'
 //获取首页统计数据
 export function getHomeStat() {
   return request({
-    url: '/v2/shop/home_page_stat/',
+    url: '/v1/shop/home_page_stat/',
     method: 'get',
     params: {},
   })
@@ -12,7 +12,7 @@ export function getHomeStat() {
 // 订单聚合
 export function orderListAgg(data: any) {
   return request({
-    url: `/v2/shop/order_detail_list_agg/`,
+    url: `/v1/shop/order_detail_list_agg/`,
     method: 'post',
     data,
   })
@@ -21,7 +21,7 @@ export function orderListAgg(data: any) {
 // 员工销售统计
 export function getStaffCommissionList(data: any) {
   return request({
-    url: `/v2/shop/staff_commission/`,
+    url: `/v1/shop/staff_commission/`,
     method: 'get',
     params: data,
   })
@@ -30,7 +30,7 @@ export function getStaffCommissionList(data: any) {
 // 日销产品统计表
 export function getStaffCommissionStatList(data?: any) {
   return request({
-    url: `/v2/shop/staff_commission_stat/`,
+    url: `/v1/shop/staff_commission_stat/`,
     method: 'get',
     params: data,
   })
@@ -39,7 +39,7 @@ export function getStaffCommissionStatList(data?: any) {
 // 日会员卡统计表
 export function getStaffDepositStatList(data?: any) {
   return request({
-    url: `/v2/shop/staff_deposit_stat/`,
+    url: `/v1/shop/staff_deposit_stat/`,
     method: 'get',
     params: data,
   })
@@ -48,7 +48,7 @@ export function getStaffDepositStatList(data?: any) {
 // 会员卡统计表
 export function getMemberStatList(data?: any) {
   return request({
-    url: `/v2/shop/total_member_stat/`,
+    url: `/v1/shop/total_member_stat/`,
     method: 'get',
     params: data,
   })
@@ -57,7 +57,7 @@ export function getMemberStatList(data?: any) {
 // 商品销售统计表
 export function getProductSalesStatList(data?: any) {
   return request({
-    url: `/v2/shop/total_product_sales_stat/`,
+    url: `/v1/shop/total_product_sales_stat/`,
     method: 'get',
     params: data,
   })
@@ -66,7 +66,7 @@ export function getProductSalesStatList(data?: any) {
 // 年度总表
 export function getYearStat(data?: any) {
   return request({
-    url: `/v2/shop/year_stat/`,
+    url: `/v1/shop/year_stat/`,
     method: 'get',
     params: data,
   })

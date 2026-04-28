@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getWithdrawList(params: object) {
   return request({
-    url: '/v2/shop/withdraw_logs/',
+    url: '/v1/shop/withdraw_logs/',
     method: 'get',
     params,
   })
@@ -14,7 +14,7 @@ export function getWithdrawList(params: object) {
 //审核提现
 export function handleWithdraw(data: any) {
   return request({
-    url: '/v2/shop/withdraw/',
+    url: '/v1/shop/withdraw/',
     method: 'post',
     data,
   })

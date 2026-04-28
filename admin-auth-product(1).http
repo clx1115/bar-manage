@@ -57,7 +57,7 @@ Content-Type: application/json
 ### 02 04是否已登录
 ### Method: isLogin
 ### HTTP: POST /v1/shop/is_login/
-### Note: @api Javadoc uses /v2/shop/is_login/; route path differs.
+### Note: @api Javadoc uses /v1/shop/is_login/; route path differs.
 ### Auth: X-AUTH-TOKEN-UID
 ### Success fields:
 ### - code: 200
@@ -69,7 +69,7 @@ X-AUTH-TOKEN-UID: {{authToken}}
 ### 03 04商户入驻注册
 ### Method: signUp
 ### HTTP: POST /v1/shop/user/new/
-### Note: @api Javadoc uses /v2/shop/user/new/; route path differs.
+### Note: @api Javadoc uses /v1/shop/user/new/; route path differs.
 ### Request body:
 ### - phoneNumber: 手机号
 ### - orgId: 店铺 ID，注册后会绑定到该店铺
@@ -95,7 +95,7 @@ Content-Type: application/json
 ### 04 08查看自己详情信息
 ### Method: getAdminMemberInfo
 ### HTTP: POST /v1/shop/admin_member/info/
-### Note: @api Javadoc uses /v2/shop/admin_member/info/; route path differs.
+### Note: @api Javadoc uses /v1/shop/admin_member/info/; route path differs.
 ### Auth: X-AUTH-TOKEN-UID
 ### Success fields:
 ### - code: 200
@@ -121,7 +121,7 @@ X-AUTH-TOKEN-UID: {{authToken}}
 ### 06 11设置/修改登录密码
 ### Method: setLoginPassword
 ### HTTP: POST /v1/shop/set_login_password/
-### Note: @api Javadoc uses /v2/shop/set_login_password/; route path differs.
+### Note: @api Javadoc uses /v1/shop/set_login_password/; route path differs.
 ### Auth: X-AUTH-TOKEN-UID
 ### Request body:
 ### - uid: 当前登录管理员 ID，必须和 token 对应

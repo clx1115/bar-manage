@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getVoucherList(data?: object) {
   return request({
-    url: '/v2/shop/pos/vouchers/',
+    url: '/v1/shop/pos/vouchers/',
     method: 'post',
     data,
   })
@@ -16,7 +16,7 @@ export function getVoucherList(data?: object) {
  */
 export function getVoucherDetail(data: any) {
   return request({
-    url: `/v2/shop/pos/vouchers/${data.id}/`,
+    url: `/v1/shop/pos/vouchers/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -27,7 +27,7 @@ export function getVoucherDetail(data: any) {
  */
 export function addVoucher(data: object) {
   return request({
-    url: '/v2/shop/pos/voucher/new/',
+    url: '/v1/shop/pos/voucher/new/',
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function addVoucher(data: object) {
  */
 export function updateVoucher(data: any) {
   return request({
-    url: `/v2/shop/pos/voucher/`,
+    url: `/v1/shop/pos/voucher/`,
     method: 'post',
     data,
   })
@@ -47,7 +47,7 @@ export function updateVoucher(data: any) {
 //删除收支记录
 export function delVoucher(data: any) {
   return request({
-    url: '/v2/shop/pos/voucher_discard/',
+    url: '/v1/shop/pos/voucher_discard/',
     method: 'post',
     data: {
       id: data.id,

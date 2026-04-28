@@ -3,7 +3,7 @@ import request from '@/utils/request'
 //获取打印机列表
 export function getPrinterList(params: object) {
   return request({
-    url: '/v2/shop/shop_printers/',
+    url: '/v1/shop/shop_printers/',
     method: 'get',
     params: params,
   })
@@ -12,7 +12,7 @@ export function getPrinterList(params: object) {
 //获取打印机详情
 export function getPrinterDetail(data: any) {
   return request({
-    url: `/v2/shop/shop_printers/${data.id}/`,
+    url: `/v1/shop/shop_printers/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -21,7 +21,7 @@ export function getPrinterDetail(data: any) {
 //添加打印机
 export function addPrinter(data: object) {
   return request({
-    url: '/v2/shop/shop_printer/new/',
+    url: '/v1/shop/shop_printer/new/',
     method: 'post',
     data,
   })
@@ -30,7 +30,7 @@ export function addPrinter(data: object) {
 //修改打印机
 export function updatePrinter(data: any) {
   return request({
-    url: `/v2/shop/shop_printer/${data.id}/`,
+    url: `/v1/shop/shop_printer/${data.id}/`,
     method: 'post',
     data,
   })
@@ -39,7 +39,7 @@ export function updatePrinter(data: any) {
 //删除打印机
 export function delPrinter(data: any) {
   return request({
-    url: '/v2/shop/shop_printer/',
+    url: '/v1/shop/shop_printer/',
     method: 'post',
     data: {
       id: data.id,
@@ -51,7 +51,7 @@ export function delPrinter(data: any) {
 //绑定打印机到云端
 export function bindPrinter(data: any) {
   return request({
-    url: `/v2/shop/bind_shop_printer/${data.printerId}/`,
+    url: `/v1/shop/bind_shop_printer/${data.printerId}/`,
     method: 'post',
     data,
   })
@@ -60,7 +60,7 @@ export function bindPrinter(data: any) {
 //清空打印机订单
 export function clearPrintOrder(data: object) {
   return request({
-    url: '/v2/shop/clear_order_to_print/',
+    url: '/v1/shop/clear_order_to_print/',
     method: 'post',
     data,
   })

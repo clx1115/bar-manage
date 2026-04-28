@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getUserList(params?: object) {
   return request({
-    url: '/v2/shop/shop_members/',
+    url: '/v1/shop/shop_members/',
     method: 'get',
     params,
   })
@@ -16,7 +16,7 @@ export function getUserList(params?: object) {
  */
 export function addUser(data: object) {
   return request({
-    url: '/v2/shop/shop_members/new/',
+    url: '/v1/shop/shop_members/new/',
     method: 'post',
     data,
   })
@@ -27,7 +27,7 @@ export function addUser(data: object) {
  */
 export function updateUser(data: any) {
   return request({
-    url: `/v2/shop/admin_member/${data.id}/`,
+    url: `/v1/shop/admin_member/${data.id}/`,
     method: 'post',
     data,
   })
@@ -36,7 +36,7 @@ export function updateUser(data: any) {
 //删除用户
 export function delUser(data: any) {
   return request({
-    url: '/v2/shop/admin_member/',
+    url: '/v1/shop/admin_member/',
     method: 'post',
     data: {
       id: data.id,

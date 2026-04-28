@@ -41,7 +41,7 @@ export function getUserInfo() {
 /* //登出
 export function logout() {
   return request({
-    url: '/v2/shop/logout/',
+    url: '/v1/shop/logout/',
     method: 'post',
   })
 } */
@@ -57,7 +57,7 @@ export function logout() {
 /* //获取验证码
 export function getCaptcha() {
   return request({
-    url: '/v2/shop/captcha/gen/noauth/',
+    url: '/v1/shop/captcha/gen/noauth/',
     method: 'get',
   })
 } */
@@ -65,7 +65,7 @@ export function getCaptcha() {
 /* //验证验证码
 export function checkCaptcha(data: object) {
   return request({
-    url: '/v2/shop/captcha/check/noauth/',
+    url: '/v1/shop/captcha/check/noauth/',
     method: 'post',
     data,
   })
@@ -84,7 +84,7 @@ export function updatePassword(data: object) {
 export function getRoutes() {
   return new Promise((resolve) => {
     request({
-      url: '/v2/shop/member_menu/',
+      url: '/v1/shop/member_menu/',
       method: 'get',
       params: {},
     }).then((data) => {

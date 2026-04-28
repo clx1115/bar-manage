@@ -12,7 +12,7 @@ export function getAfterSalesList(data: object) {
 //获取订单详情
 export function getAfterSalesDetail(data: any) {
   return request({
-    url: `/v2/shop/order_returns/${data.id}/`,
+    url: `/v1/shop/order_returns/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -30,7 +30,7 @@ export function directRefundOrder(data: any) {
 // 处理退货
 export function handleOrderReturn(data: any) {
   return request({
-    url: '/v2/shop/handle_order_return/',
+    url: '/v1/shop/handle_order_return/',
     method: 'post',
     data,
   })
@@ -39,7 +39,7 @@ export function handleOrderReturn(data: any) {
 // 驳回退款
 export function rejectOrderRefund(data: any) {
   return request({
-    url: '/v2/shop/reject_order_refund/',
+    url: '/v1/shop/reject_order_refund/',
     method: 'post',
     data,
   })
@@ -48,7 +48,7 @@ export function rejectOrderRefund(data: any) {
 // 同意退款
 export function handleOrderRefund(data: any) {
   return request({
-    url: '/v2/shop/handle_order_refund/',
+    url: '/v1/shop/handle_order_refund/',
     method: 'post',
     data,
   })

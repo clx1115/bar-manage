@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getDealerLevelList(data?: any) {
   return request({
-    url: '/v2/shop/dealer_level_list/',
+    url: '/v1/shop/dealer_level_list/',
     method: 'get',
     params: data,
   })
@@ -16,7 +16,7 @@ export function getDealerLevelList(data?: any) {
  */
 export function getDealerLevelDetail(data: any) {
   return request({
-    url: `/v2/shop/dealer_level/${data.id}/`,
+    url: `/v1/shop/dealer_level/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -27,7 +27,7 @@ export function getDealerLevelDetail(data: any) {
  */
 export function addDealerLevel(data: any) {
   return request({
-    url: '/v2/shop/dealer_level/new/',
+    url: '/v1/shop/dealer_level/new/',
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function addDealerLevel(data: any) {
  */
 export function updateDealerLevel(data: any) {
   return request({
-    url: `/v2/shop/dealer_level/${data.id}/`,
+    url: `/v1/shop/dealer_level/${data.id}/`,
     method: 'post',
     data,
   })
@@ -47,7 +47,7 @@ export function updateDealerLevel(data: any) {
 //删除分销员等级
 export function delDealerLevel(data: any) {
   return request({
-    url: '/v2/shop/dealer_level/',
+    url: '/v1/shop/dealer_level/',
     method: 'post',
     data: {
       id: data.id,

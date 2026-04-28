@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getCategroyList(params?: object) {
   return request({
-    url: '/v2/shop/articles_category_list/',
+    url: '/v1/shop/articles_category_list/',
     method: 'get',
     params: params,
   })
@@ -16,7 +16,7 @@ export function getCategroyList(params?: object) {
  */
 export function getCategroyDetail(data: any) {
   return request({
-    url: `/v2/shop/articles_category/${data.id}/`,
+    url: `/v1/shop/articles_category/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -27,7 +27,7 @@ export function getCategroyDetail(data: any) {
  */
 export function addCategroy(data: object) {
   return request({
-    url: '/v2/shop/articles_category/new/',
+    url: '/v1/shop/articles_category/new/',
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function addCategroy(data: object) {
  */
 export function updateCategroy(data: any) {
   return request({
-    url: `/v2/shop/articles_category/${data.id}/`,
+    url: `/v1/shop/articles_category/${data.id}/`,
     method: 'post',
     data,
   })
@@ -47,7 +47,7 @@ export function updateCategroy(data: any) {
 //删除分类
 export function delCategroy(data: any) {
   return request({
-    url: '/v2/shop/articles_category/',
+    url: '/v1/shop/articles_category/',
     method: 'post',
     data: {
       id: data.id,

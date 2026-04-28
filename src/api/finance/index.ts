@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getBalanceLog(params:object) {
   return request({
-    url: '/v2/shop/member_balance_log/',
+    url: '/v1/shop/member_balance_log/',
     method: 'get',
     params:params,
   })
@@ -16,7 +16,7 @@ export function getBalanceLog(params:object) {
  */
 export function getChargeLog(data: object) {
   return request({
-    url: '/v2/shop/deposit_log_list/',
+    url: '/v1/shop/deposit_log_list/',
     method: 'post',
     data,
   })

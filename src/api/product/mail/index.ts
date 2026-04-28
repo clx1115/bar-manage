@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getMailList(params?: object) {
   return request({
-    url: '/v2/shop/shop_mail/mail_fee_list/',
+    url: '/v1/shop/shop_mail/mail_fee_list/',
     method: 'get',
     params: params,
   })
@@ -17,7 +17,7 @@ export function getMailList(params?: object) {
  */
 export function addMail(data: object) {
   return request({
-    url: '/v2/shop/shop_mail/mail_fee/new/',
+    url: '/v1/shop/shop_mail/mail_fee/new/',
     method: 'post',
     data
   })
@@ -28,7 +28,7 @@ export function addMail(data: object) {
  */
 export function updateMail(data: any) {
   return request({
-    url: `/v2/shop/shop_mail/mail_fee/${data.id}/`,
+    url: `/v1/shop/shop_mail/mail_fee/${data.id}/`,
     method: 'post',
     data
   })
@@ -37,7 +37,7 @@ export function updateMail(data: any) {
 //删除运费
 export function delMail(data: any) {
   return request({
-    url: '/v2/shop/shop_mail/mail_fee/',
+    url: '/v1/shop/shop_mail/mail_fee/',
     method: 'post',
     data: {
       id: data.id,
@@ -49,7 +49,7 @@ export function delMail(data: any) {
 //运费详情
 export function getMailDetail(params?: object) {
   return request({
-    url: '/v2/shop/shop_mail/mail_fee_list/',
+    url: '/v1/shop/shop_mail/mail_fee_list/',
     method: 'get',
     params: params,
   })

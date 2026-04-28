@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getCoverList(params?: object) {
   return request({
-    url: '/v2/shop/cover_frame_list/',
+    url: '/v1/shop/cover_frame_list/',
     method: 'get',
     params: params,
   })
@@ -16,7 +16,7 @@ export function getCoverList(params?: object) {
  */
 export function addCover(data: any) {
   return request({
-    url: '/v2/shop/cover_frame/new/',
+    url: '/v1/shop/cover_frame/new/',
     method: 'post',
     data,
   })
@@ -27,7 +27,7 @@ export function addCover(data: any) {
  */
 export function updateCover(data: any) {
   return request({
-    url: `/v2/shop/cover_frame/${data.id}/`,
+    url: `/v1/shop/cover_frame/${data.id}/`,
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function updateCover(data: any) {
  */
 export function delCover(data: any) {
   return request({
-    url: '/v2/shop/cover_frame/',
+    url: '/v1/shop/cover_frame/',
     method: 'post',
     data: {
       id: data.id,

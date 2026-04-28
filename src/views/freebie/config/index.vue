@@ -61,7 +61,7 @@
         type="success"
         show-icon
         :closable="false"
-        class="mb20"
+        class="config-alert"
       >
         当前已存在门店配置，配置ID：{{ currentConfigId }}
       </el-alert>
@@ -72,102 +72,113 @@
         :rules="rules"
         label-width="180px"
         v-loading="configLoading"
+        class="config-form"
       >
-        <el-row :gutter="20">
-          <el-col :xs="24" :md="12">
-            <el-form-item label="关联商品" prop="itemId">
-              <el-select
-                v-model="form.itemId"
-                filterable
-                remote
-                reserve-keyword
-                clearable
-                placeholder="请选择引流品"
-                :remote-method="loadItemOptions"
-                :loading="itemLoading"
-                @focus="loadItemOptions('')"
-                class="w100"
-              >
-                <el-option
-                  v-for="item in itemOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
+        <div class="config-section">
+          <div class="section-title">基础设置</div>
+          <el-row :gutter="24">
+            <el-col :xs="24" :md="12">
+              <el-form-item label="关联商品" prop="itemId">
+                <div class="product-selector">
+                  <el-input
+                    :model-value="form.itemName"
+                    readonly
+                    placeholder="请选择引流品"
+                    class="w100"
+                  />
+                  <el-button type="primary" plain @click="openProductSelect">
+                    选择商品
+                  </el-button>
+                  <el-button v-if="form.itemId" @click="clearSelectedProduct">
+                    清空
+                  </el-button>
+                </div>
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-form-item label="积分类型" prop="pointsType">
+                <el-radio-group v-model="form.pointsType">
+                  <el-radio :label="1">豪气值</el-radio>
+                  <el-radio :label="2">游戏积分</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+
+        <div class="config-section">
+          <div class="section-title">活动规则</div>
+          <el-row :gutter="24">
+            <el-col :xs="24" :md="12">
+              <el-form-item label="新用户首次绑定赠送数量" prop="freeFreebieCount">
+                <el-input-number v-model="form.freeFreebieCount" :min="0" class="w100" />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-form-item label="每日首次绑定赠送数量" prop="dailyFirstFreebieCount">
+                <el-input-number
+                  v-model="form.dailyFirstFreebieCount"
+                  :min="0"
+                  class="w100"
                 />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="积分类型" prop="pointsType">
-              <el-radio-group v-model="form.pointsType">
-                <el-radio :label="1">豪气值</el-radio>
-                <el-radio :label="2">游戏积分</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="新用户首次绑定赠送数量" prop="freeFreebieCount">
-              <el-input-number v-model="form.freeFreebieCount" :min="0" class="w100" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="每日首次绑定赠送数量" prop="dailyFirstFreebieCount">
-              <el-input-number
-                v-model="form.dailyFirstFreebieCount"
-                :min="0"
-                class="w100"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="积分兑换比例分子" prop="pointsExchangeRatio">
-              <el-input-number
-                v-model="form.pointsExchangeRatio"
-                :min="0"
-                class="w100"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="积分兑换比例分母" prop="pointsPerBottle">
-              <el-input-number v-model="form.pointsPerBottle" :min="1" class="w100" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="每日免费领取上限" prop="dailyFreeLimit">
-              <el-input-number v-model="form.dailyFreeLimit" :min="0" class="w100" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="活动总开关">
-              <el-switch v-model="form.activityEnabled" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="积分兑换通道">
-              <el-switch v-model="form.exchangeEnabled" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="新用户首次绑定赠送">
-              <el-switch v-model="form.newUserFirstBindingGift" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :md="12">
-            <el-form-item label="每日首次绑定赠送">
-              <el-switch v-model="form.dailyFirstBindingGift" />
-            </el-form-item>
-          </el-col>
-        </el-row>
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-form-item label="积分兑换比例分子" prop="pointsExchangeRatio">
+                <el-input-number
+                  v-model="form.pointsExchangeRatio"
+                  :min="0"
+                  class="w100"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-form-item label="积分兑换比例分母" prop="pointsPerBottle">
+                <el-input-number v-model="form.pointsPerBottle" :min="1" class="w100" />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-form-item label="每日免费领取上限" prop="dailyFreeLimit">
+                <el-input-number v-model="form.dailyFreeLimit" :min="0" class="w100" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+
+        <div class="config-section">
+          <div class="section-title">功能开关</div>
+          <el-row :gutter="24">
+            <el-col :xs="24" :md="12">
+              <el-form-item label="活动总开关" class="switch-item">
+                <el-switch v-model="form.activityEnabled" />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-form-item label="积分兑换通道" class="switch-item">
+                <el-switch v-model="form.exchangeEnabled" />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-form-item label="新用户首次绑定赠送" class="switch-item">
+                <el-switch v-model="form.newUserFirstBindingGift" />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :md="12">
+              <el-form-item label="每日首次绑定赠送" class="switch-item">
+                <el-switch v-model="form.dailyFirstBindingGift" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
       </el-form>
     </el-card>
+    <productSelect ref="productSelectRef" @select="onProductSelect" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, toRefs } from 'vue'
+import { defineAsyncComponent, onMounted, reactive, ref, toRefs } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { getItemList } from '@/api/product/item/index'
 import {
   getFreebieConfig,
   getFreebieStatistics,
@@ -176,6 +187,7 @@ import {
 
 const createDefaultForm = () => ({
   itemId: undefined as number | undefined,
+  itemName: '',
   freeFreebieCount: 0,
   dailyFirstFreebieCount: 0,
   pointsExchangeRatio: 0,
@@ -189,7 +201,11 @@ const createDefaultForm = () => ({
 })
 
 const formRef = ref<FormInstance>()
+const productSelectRef = ref()
 const timeRange = ref([] as any[])
+const productSelect = defineAsyncComponent(
+  () => import('@/views/product/component/select.vue')
+)
 const rules: FormRules = {
   itemId: [{ required: true, message: '请选择关联商品', trigger: 'change' }],
   pointsType: [{ required: true, message: '请选择积分类型', trigger: 'change' }],
@@ -205,8 +221,6 @@ const state = reactive({
   currentConfigId: 0,
   configLoading: false,
   saveLoading: false,
-  itemLoading: false,
-  itemOptions: [] as any[],
   statsLoading: false,
   statistics: {
     totalCouponCount: 0,
@@ -221,35 +235,26 @@ const {
   currentConfigId,
   configLoading,
   saveLoading,
-  itemLoading,
-  itemOptions,
   statsLoading,
   statistics,
 } = toRefs(state)
 
-const ensureCurrentItem = (config: any) => {
-  if (!config?.itemId || !config?.itemName) return
-  const exists = state.itemOptions.some((item) => item.id === config.itemId)
-  if (!exists) {
-    state.itemOptions.unshift({
-      id: config.itemId,
-      name: config.itemName,
-    })
-  }
+const openProductSelect = () => {
+  productSelectRef.value?.openDialog('radio', [])
 }
 
-const loadItemOptions = async (keyword = '') => {
-  state.itemLoading = true
-  try {
-    const data = await getItemList({
-      page: 1,
-      size: 100,
-      filter: keyword,
-    })
-    state.itemOptions = data.list || []
-  } finally {
-    state.itemLoading = false
-  }
+const onProductSelect = (rows: any[]) => {
+  const [row] = rows || []
+  if (!row) return
+  state.form.itemId = row.id
+  state.form.itemName = row.name || ''
+  formRef.value?.validateField('itemId')
+}
+
+const clearSelectedProduct = () => {
+  state.form.itemId = undefined
+  state.form.itemName = ''
+  formRef.value?.validateField('itemId')
 }
 
 const loadConfig = async () => {
@@ -261,6 +266,7 @@ const loadConfig = async () => {
       state.currentConfigId = config.id || 0
       state.form = {
         itemId: config.itemId,
+        itemName: config.itemName || config.productName || '',
         freeFreebieCount: config.freeFreebieCount ?? 0,
         dailyFirstFreebieCount: config.dailyFirstFreebieCount ?? 0,
         pointsExchangeRatio: config.pointsExchangeRatio ?? 0,
@@ -272,7 +278,6 @@ const loadConfig = async () => {
         dailyFirstBindingGift: !!config.dailyFirstBindingGift,
         pointsType: config.pointsType ?? 1,
       }
-      ensureCurrentItem(config)
     } else {
       state.currentConfigId = 0
       state.form = createDefaultForm()
@@ -328,7 +333,6 @@ const onSave = async () => {
 }
 
 onMounted(async () => {
-  await loadItemOptions('')
   await Promise.all([loadConfig(), loadStatistics()])
 })
 </script>
@@ -388,7 +392,101 @@ onMounted(async () => {
   color: #303133;
 }
 
+.config-alert {
+  margin: 8px 0 26px;
+}
+
+:deep(.config-alert.el-alert) {
+  padding: 14px 18px;
+  border: 1px solid #b7e3c1;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f3fbf5 0%, #edf9f1 100%);
+}
+
+:deep(.config-alert .el-alert__icon) {
+  font-size: 18px;
+  color: #3fb950;
+}
+
+:deep(.config-alert .el-alert__content) {
+  color: #2f6b3b;
+  font-weight: 500;
+}
+
+.config-form {
+  margin-top: 8px;
+}
+
+.config-section {
+  padding: 22px 24px 10px;
+  margin-bottom: 18px;
+  border: 1px solid #ebeef5;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+}
+
+.section-title {
+  margin-bottom: 18px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.config-section :deep(.el-row) {
+  row-gap: 10px;
+}
+
 .w100 {
   width: 100%;
+}
+
+.product-selector {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+  align-items: center;
+}
+
+:deep(.config-form .el-form-item) {
+  margin-bottom: 24px;
+}
+
+:deep(.config-form .el-form-item__label) {
+  color: #606266;
+}
+
+:deep(.config-form .el-form-item__content) {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+:deep(.config-form .el-input__wrapper) {
+  min-height: 40px;
+}
+
+:deep(.config-form .el-input-number) {
+  width: 100%;
+}
+
+:deep(.switch-item .el-form-item__content) {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+  .config-alert {
+    margin: 4px 0 20px;
+  }
+
+  .config-section {
+    padding: 18px 16px 6px;
+    border-radius: 12px;
+  }
+
+  .product-selector {
+    flex-wrap: wrap;
+  }
 }
 </style>

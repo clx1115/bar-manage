@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getWorkDaySettingList(params?: object) {
   return request({
-    url: '/v2/shop/staff_month_work_day_list/',
+    url: '/v1/shop/staff_month_work_day_list/',
     method: 'get',
     params: params,
   })
@@ -16,7 +16,7 @@ export function getWorkDaySettingList(params?: object) {
  */
 export function getWorkDaySettingDetail(data: any) {
   return request({
-    url: `/v2/shop/staff_month_work_day/${data.id}/`,
+    url: `/v1/shop/staff_month_work_day/${data.id}/`,
     method: 'get',
     data
   })
@@ -27,7 +27,7 @@ export function getWorkDaySettingDetail(data: any) {
  */
 export function addWorkDaySetting(data: object) {
   return request({
-    url: '/v2/shop/staff_month_work_day/new/',
+    url: '/v1/shop/staff_month_work_day/new/',
     method: 'post',
     data,
   })
@@ -38,7 +38,7 @@ export function addWorkDaySetting(data: object) {
  */
 export function updateWorkDaySetting(data: any) {
   return request({
-    url: `/v2/shop/staff_month_work_day/${data.id}/`,
+    url: `/v1/shop/staff_month_work_day/${data.id}/`,
     method: 'post',
     data,
 
@@ -48,7 +48,7 @@ export function updateWorkDaySetting(data: any) {
 //删除考勤天数
 export function delWorkDaySetting(data: any) {
   return request({
-    url: '/v2/shop/staff_month_work_day/',
+    url: '/v1/shop/staff_month_work_day/',
     method: 'post',
     data: {
       id: data.id,

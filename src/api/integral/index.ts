@@ -3,7 +3,7 @@ import request from '@/utils/request'
 //获取积分商品列表
 export function getScoreList(data: any) {
   return request({
-    url: '/v2/shop/score_product_list/',
+    url: '/v1/shop/score_product_list/',
     method: 'post',
     data,
   })
@@ -14,7 +14,7 @@ export function getScoreList(data: any) {
  */
 export function getScoreDetail(data: any) {
   return request({
-    url: `/v2/shop/score_product/${data.id}/`,
+    url: `/v1/shop/score_product/${data.id}/`,
     method: 'get',
     params: {},
   })
@@ -25,7 +25,7 @@ export function getScoreDetail(data: any) {
  */
 export function addScore(data: object) {
   return request({
-    url: '/v2/shop/score_products/new/',
+    url: '/v1/shop/score_products/new/',
     method: 'post',
     data,
   })
@@ -34,7 +34,7 @@ export function addScore(data: object) {
 //修改积分商品信息
 export function updateScore(data: any) {
   return request({
-    url: `/v2/shop/score_products/${data.id}/`,
+    url: `/v1/shop/score_products/${data.id}/`,
     method: 'post',
     data,
   })
@@ -43,7 +43,7 @@ export function updateScore(data: any) {
 //删除积分商品
 export function delScore(data: any) {
   return request({
-    url: '/v2/shop/score_products/',
+    url: '/v1/shop/score_products/',
     method: 'post',
     data: { list: data.id, operation: 'del' },
   })
@@ -52,7 +52,7 @@ export function delScore(data: any) {
 //商品上下架
 export function setStatus(data: any) {
   return request({
-    url: `/v2/shop/score_product_status/${data.id}/`,
+    url: `/v1/shop/score_product_status/${data.id}/`,
     method: 'post',
     data,
   })
@@ -61,7 +61,7 @@ export function setStatus(data: any) {
 //商品批量上下架
 export function batchSetStatus(data: any) {
   return request({
-    url: '/v2/shop/batch_update_score_product_status/',
+    url: '/v1/shop/batch_update_score_product_status/',
     method: 'post',
     data,
   })

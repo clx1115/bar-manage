@@ -66,7 +66,7 @@ export function batchSetStatus(data: any) {
 /* //批量绑定商品到店铺
 export function batchCloneProduct(data: any) {
   return request({
-    url: '/v2/shop/batch_clone_product/',
+    url: '/v1/shop/batch_clone_product/',
     method: 'post',
     data,
   })

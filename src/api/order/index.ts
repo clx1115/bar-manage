@@ -1,9 +1,18 @@
 import request from '@/utils/request'
 
+//普通订单列表
+export function listOrders(data: object) {
+  return request({
+    url: '/v1/shop/orders/',
+    method: 'post',
+    data,
+  })
+}
+
 //获取店铺订单列表
 export function getOrderList(data: object) {
   return request({
-    url: '/v2/shop/shop_orders/',
+    url: '/v1/shop/shop_orders/',
     method: 'post',
     data,
   })
@@ -12,7 +21,7 @@ export function getOrderList(data: object) {
 //获取店铺订单详情
 export function getOrderDetail(data: any) {
   return request({
-    url: `/v2/shop/shop_orders/${data.id}/`,
+    url: `/v1/shop/shop_orders/${data.id}/`,
     method: 'get',
     data
   })
@@ -20,7 +29,7 @@ export function getOrderDetail(data: any) {
 //订单日志列表
 export function getOrderLog(data: any) {
   return request({
-    url: `/v2/shop/shop_order_logs/${data.id}/`,
+    url: `/v1/shop/shop_order_logs/${data.id}/`,
     method: 'get',
     params: {}
   })
@@ -29,7 +38,7 @@ export function getOrderLog(data: any) {
 //订单发货
 export function orderDelievered(data: any) {
   return request({
-    url: `/v2/shop/order_delievered/${data.orderId}/`,
+    url: `/v1/shop/order_delievered/${data.orderId}/`,
     method: 'post',
     data,
   })
@@ -38,7 +47,7 @@ export function orderDelievered(data: any) {
 //后台取消订单
 export function cancelOrder(data: any) {
   return request({
-    url: `/v2/shop/pos/orders/${data.id}/`,
+    url: `/v1/shop/pos/orders/${data.id}/`,
     method: 'post',
     data: {
       orderId: data.id,
@@ -51,7 +60,7 @@ export function cancelOrder(data: any) {
 //订单批量发货
 export function batchOrderDelievered(data: any) {
   return request({
-    url: '/v2/shop/batch_order_delievered/',
+    url: '/v1/shop/batch_order_delievered/',
     method: 'post',
     data,
   })
@@ -60,7 +69,7 @@ export function batchOrderDelievered(data: any) {
 //获取订单状态统计
 export function getOrderCount() {
   return request({
-    url: '/v2/shop/order_count/',
+    url: '/v1/shop/order_count/',
     method: 'get',
     params: {},
   })
@@ -69,7 +78,7 @@ export function getOrderCount() {
 //获取打印订单模板
 export function getPrintTemplate(data: any) {
   return request({
-    url: '/v2/shop/org_print_template_list/',
+    url: '/v1/shop/org_print_template_list/',
     method: 'post',
     data,
   })
@@ -79,7 +88,7 @@ export function getPrintTemplate(data: any) {
 //获取打印订单详情
 export function getPrintTemplateDetail(data: any) {
   return request({
-    url: `/v2/shop/org_print_template_list/${data.id}/`,
+    url: `/v1/shop/org_print_template_list/${data.id}/`,
     method: 'get',
     params: {}
   })
@@ -88,7 +97,7 @@ export function getPrintTemplateDetail(data: any) {
 //更新手动打印次数
 export function updatePrintCount(data: any) {
   return request({
-    url: `/v2/shop/order_print_count/${data.id}/`,
+    url: `/v1/shop/order_print_count/${data.id}/`,
     method: 'post',
     data: {}
   })
