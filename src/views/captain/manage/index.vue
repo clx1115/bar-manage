@@ -40,6 +40,11 @@
         <el-table-column prop="totalOrders" label="订单总数" width="100" />
         <el-table-column prop="availableBalance" label="可用余额" width="120" />
         <el-table-column prop="totalGmv" label="总GMV" width="120" />
+        <el-table-column label="佣金比例" width="120">
+          <template #default="{ row }">
+            {{ formatCommissionRate(row) }}
+          </template>
+        </el-table-column>
         <el-table-column label="状态" width="140">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)">
@@ -147,6 +152,20 @@ const statusTagType = (status: number) => {
   if (status === 0) return 'warning'
   if (status === 2) return 'danger'
   return 'info'
+}
+
+const formatCommissionRate = (row: any) => {
+  const rawValue = row.commissionRate ?? row.commission_ratio ?? row.ratio ?? row.commission
+  if (rawValue === undefined || rawValue === null || rawValue === '') return '-'
+
+  const value = Number(rawValue)
+  if (Number.isNaN(value)) return rawValue
+
+  if (value <= 1) {
+    return `${(value * 100).toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}%`
+  }
+
+  return `${value.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}%`
 }
 
 const getListData = async () => {
