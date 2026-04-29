@@ -36,12 +36,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, toRefs } from 'vue'
-import { ElForm } from 'element-plus'
+import { computed, nextTick, reactive, ref, toRefs } from 'vue'
+import type { FormInstance } from 'element-plus'
 import { addAreaTable, getAreaTableDetail, updateAreaTable } from '@/api/base/table/index'
 
 const emit = defineEmits(['refresh'])
-const detailFormRef = ref(ElForm)
+const detailFormRef = ref<FormInstance>()
 
 const state = reactive({
   type: 'add',
@@ -80,6 +80,7 @@ const openDialog = async (type: string, row?: any) => {
   state.loading = false
   state.ruleForm = createDefaultForm()
   state.isShowDialog = true
+  await nextTick()
   detailFormRef.value?.clearValidate()
 
   if (type === 'edit' && row?.id) {
@@ -111,7 +112,7 @@ const onSubmit = () => {
     name: state.ruleForm.name?.trim(),
   }
 
-  detailFormRef.value.validate((valid: boolean) => {
+  detailFormRef.value?.validate((valid: boolean) => {
     if (!valid) return false
 
     state.loading = true

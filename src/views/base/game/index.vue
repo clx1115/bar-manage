@@ -70,7 +70,13 @@
       </div>
     </el-card>
 
-    <el-dialog :title="dialogType === 'edit' ? '编辑游戏' : '新增游戏'" v-model="dialogVisible" width="720px" :close-on-click-modal="false">
+    <el-dialog
+      :title="dialogType === 'edit' ? '编辑游戏' : '新增游戏'"
+      v-model="dialogVisible"
+      width="760px"
+      class="pretty-dialog"
+      :close-on-click-modal="false"
+    >
       <el-form ref="formRef" class="dialog-form" :model="formData" :rules="rules" label-width="110px">
         <el-row :gutter="20">
           <el-col :span="12">
@@ -101,7 +107,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="最小人数" prop="minPlayers">
+            <el-form-item label="最少人数" prop="minPlayers">
               <el-input-number v-model="formData.minPlayers" class="w100" :min="1" />
             </el-form-item>
           </el-col>
@@ -118,8 +124,12 @@
         </el-row>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitLoading" @click="onSubmit">保存</el-button>
+        <div class="dialog-footer">
+          <el-button class="dialog-footer__button" @click="dialogVisible = false">取消</el-button>
+          <el-button class="dialog-footer__button dialog-footer__button--primary" type="primary" :loading="submitLoading" @click="onSubmit">
+            保存
+          </el-button>
+        </div>
       </template>
     </el-dialog>
   </div>
@@ -147,7 +157,7 @@ const state = reactive({
     gameName: [{ required: true, message: '请输入游戏名称', trigger: 'blur' }],
     gameIcon: [{ required: true, message: '请上传游戏图标', trigger: 'change' }],
     gameType: [{ required: true, message: '请选择游戏类型', trigger: 'change' }],
-    minPlayers: [{ required: true, message: '请输入最小人数', trigger: 'change' }],
+    minPlayers: [{ required: true, message: '请输入最少人数', trigger: 'change' }],
     maxPlayers: [{ required: true, message: '请输入最大人数', trigger: 'change' }],
     status: [{ required: true, message: '请选择状态', trigger: 'change' }],
   },
@@ -206,7 +216,7 @@ const doDelete = async (ids: number[]) => {
 }
 
 const onDelete = (row: any) => {
-  ElMessageBox.confirm(`确认删除游戏「${row.gameName}」吗？`, '提示', { type: 'warning' })
+  ElMessageBox.confirm(`确认删除游戏“${row.gameName}”吗？`, '提示', { type: 'warning' })
     .then(() => doDelete([row.gameId]))
     .catch(() => {})
 }
@@ -317,11 +327,108 @@ onMounted(() => {
   padding: 13px 0;
 }
 
-.dialog-form :deep(.el-form-item) {
-  margin-bottom: 20px;
+.dialog-form {
+  padding-top: 2px;
 }
 
-:deep(.el-dialog__body) {
-  padding-top: 12px;
+.dialog-form :deep(.el-row) {
+  row-gap: 22px;
+}
+
+.dialog-form :deep(.el-col) {
+  margin-bottom: 0;
+}
+
+.dialog-form :deep(.el-form-item) {
+  margin-bottom: 0;
+}
+
+.dialog-form :deep(.el-form-item__label) {
+  padding-right: 14px;
+  color: #344054;
+  font-weight: 500;
+}
+
+.dialog-form :deep(.el-input__wrapper),
+.dialog-form :deep(.el-textarea__inner),
+.dialog-form :deep(.el-select__wrapper) {
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px #d7deea inset;
+}
+
+.dialog-form :deep(.el-input__wrapper),
+.dialog-form :deep(.el-select__wrapper),
+.dialog-form :deep(.el-input-number) {
+  min-height: 42px;
+}
+
+.dialog-form :deep(.el-input-number) {
+  width: 100%;
+}
+
+.dialog-form :deep(.el-textarea__inner) {
+  min-height: 120px;
+  line-height: 1.7;
+}
+
+.dialog-form :deep(.upload-img) {
+  display: flex;
+  align-items: center;
+  min-height: 112px;
+}
+
+.dialog-form :deep(.upload-img .el-upload),
+.dialog-form :deep(.upload-img .el-upload-list__item) {
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+:deep(.pretty-dialog .el-dialog) {
+  overflow: hidden;
+  border: 1px solid #eef2f7;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+:deep(.pretty-dialog .el-dialog__header) {
+  padding: 26px 28px 12px;
+  border-bottom: 1px solid #f2f4f7;
+}
+
+:deep(.pretty-dialog .el-dialog__title) {
+  font-size: 22px;
+  font-weight: 600;
+  color: #101828;
+}
+
+:deep(.pretty-dialog .el-dialog__headerbtn) {
+  top: 24px;
+  right: 24px;
+}
+
+:deep(.pretty-dialog .el-dialog__body) {
+  padding: 24px 28px 8px;
+  background: linear-gradient(180deg, #fcfdff 0%, #f8fbff 100%);
+}
+
+:deep(.pretty-dialog .el-dialog__footer) {
+  padding: 18px 28px 26px;
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0) 0%, #f8fbff 100%);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.dialog-footer__button {
+  min-width: 86px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.dialog-footer__button--primary {
+  box-shadow: 0 10px 24px rgba(64, 158, 255, 0.25);
 }
 </style>
