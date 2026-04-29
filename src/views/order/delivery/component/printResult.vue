@@ -42,6 +42,32 @@ let hiprintTemplate: any;
 
 const stores = useUserInfo()
 const { userInfos } = storeToRefs(stores) as any
+
+const normalizeAddress = (source: any) => {
+  if (!source) return { name: '', telephone: '', details: '', address: '' }
+  if (source.address) {
+    try {
+      return JSON.parse(source.address)
+    } catch (error) {
+      return source
+    }
+  }
+  return {
+    name: source.userName ?? '',
+    telephone: source.telephone ?? '',
+    details: `${source.province ?? ''}${source.city ?? ''}${source.details ?? ''}`,
+    address: '',
+  }
+}
+
+const normalizeDetailList = (source: any[] = []) => source.map((item: any) => ({
+  ...item,
+  productName: item.productName ?? item.merchantName ?? '',
+  skuName: item.skuName ?? item.attributeName ?? item.attributeDetails ?? item.attributes ?? '',
+  productPrice: item.productPrice ?? item.price ?? 0,
+  subTotal: item.subTotal ?? item.eachTotalMoney ?? 0,
+  number: item.number ?? item.amount ?? 0,
+}))
 const state = reactive({
   loading: false,
   isShowDialog: false,
@@ -110,12 +136,12 @@ const onPrint = () => {
     getOrderDetail({
       id: orderData.id,
     }).then((res) => {
-      const address = res.deliveryType === 2 ? JSON.parse(res.orderReceiveDetail.address) : { name: '', telephone: '', details: '', address: '' }
+      const address = res.deliveryType === 2 ? normalizeAddress(res.orderReceiveDetail ?? res.addressDetail) : { name: '', telephone: '', details: '', address: '' }
       const templateData = JSON.parse(state.printTemplate)
       hiprintTemplate = new hiprint.PrintTemplate({
         template: templateData.content
       });
-      const detailList = res.detailList.map((item: any) => {
+      const detailList = normalizeDetailList(res.detailList ?? res.merchantList).map((item: any) => {
         return {
           shopName: res.shopName,
           barcode: item.barcode,
@@ -131,16 +157,16 @@ const onPrint = () => {
       })
       const printData = {
         orderNo: res.orderNo,
-        userName: res.userName,
+        userName: res.userName ?? res.addressDetail?.userName,
         contact: address.name + ' - ' + address.telephone,
         address: address.details + address.address,
         salesman: res.dealerName,
         date: formatDate(res.createTime, 'YYYY-mm-dd HH:MM:SS'),
         creater: userInfos.value.name,
         printDate: formatDate(new Date().getTime(), 'YYYY-mm-dd HH:MM:SS'),
-        payMethod: res.payMethodName,
-        totalMoney: parseMoney(res.realPay),
-        totalCap: verifyNumberCnUppercase(parseMoney(res.realPay)),
+        payMethod: res.payMethodName ?? '',
+        totalMoney: parseMoney(res.realPay ?? res.totalMoney ?? 0),
+        totalCap: verifyNumberCnUppercase(parseMoney(res.realPay ?? res.totalMoney ?? 0)),
         table: detailList
       }
       hiprintTemplate.print2(printData, { printer: '', pageSize: { height: templateData.paperConfig.height * 1000, width: templateData.paperConfig.width * 1000 }, title: '订单打印' });

@@ -185,7 +185,7 @@
               <router-link :to="`/order/detail?orderId=${row.id}`" class="mr10">
                 <el-button size="small" text type="primary">详情</el-button>
               </router-link>
-              <el-button v-if="userInfos.roles[0] === 'admin' || userInfos.roles[0] === 'director' || userInfos.roles[0] === 'finance' || userInfos.roles[0] === 'cashier'" size="small" text type="primary" @click="onPrintOrder(row)">打印订单</el-button>
+              <!-- <el-button v-if="userInfos.roles[0] === 'admin' || userInfos.roles[0] === 'director' || userInfos.roles[0] === 'finance' || userInfos.roles[0] === 'cashier'" size="small" text type="primary" @click="onPrintOrder(row)">打印订单</el-button> -->
               <el-button v-if="row.status >= 10 && (userInfos.roles[0] === 'admin' || userInfos.roles[0] === 'director' || userInfos.roles[0] === 'finance' || userInfos.roles[0] === 'cashier')" size="small" text type="primary" @click="onCancelOrder(row)">取消订单</el-button>
             </el-form>
           </template>
@@ -249,8 +249,14 @@ const defaultQuery = {
   filter: '',
 }
 
-const beginTime = new Date(new Date().toLocaleDateString()).getTime()
-const timeRange = ref([beginTime, beginTime])
+const getDefaultOrderTimeRange = () => {
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime()
+  const todayStart = new Date(now.toLocaleDateString()).getTime()
+  return [monthStart, todayStart]
+}
+
+const timeRange = ref(getDefaultOrderTimeRange())
 const scheduleTimeRange = ref([] as number[])
 const printOrderRef = ref()
 const state = reactive({
@@ -363,7 +369,7 @@ const onPrintOrder = (row: any) => {
 
 const refreshQuery = () => {
   state.queryData = Object.assign({}, defaultQuery)
-  timeRange.value = [beginTime, beginTime]
+  timeRange.value = getDefaultOrderTimeRange()
   scheduleTimeRange.value = []
   getListData()
 }

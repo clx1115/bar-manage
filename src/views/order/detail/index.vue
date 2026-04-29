@@ -26,7 +26,7 @@
                   售后状态
                 </div>
               </template>
-              {{ formatAfterSalesStatus(detail.status) }}
+              {{ formatAfterSalesStatus(detail.postServiceStatus) }}
             </el-descriptions-item>
             <el-descriptions-item>
               <template #label>
@@ -272,19 +272,63 @@ const state = reactive({
 const { loading, detail, detailList, address } = toRefs(state)
 const router = useRouter()
 
+const normalizeAddress = (source: any) => {
+  if (!source) return {}
+  if (source.address) {
+    try {
+      return JSON.parse(source.address)
+    } catch (error) {
+      return source
+    }
+  }
+  return {
+    name: source.userName ?? '',
+    telephone: source.telephone ?? '',
+    details: `${source.province ?? ''}${source.city ?? ''}${source.details ?? ''}`,
+    address: '',
+    postcode: source.postcode ?? '',
+  }
+}
+
+const normalizeDetailList = (source: any[] = []) => source.map((item: any) => ({
+  ...item,
+  productName: item.productName ?? item.merchantName ?? '',
+  skuName: item.skuName ?? item.attributeName ?? item.attributeDetails ?? item.attributes ?? '',
+  productPrice: item.productPrice ?? item.price ?? 0,
+  resultPrice: item.resultPrice ?? item.price ?? 0,
+  subTotal: item.subTotal ?? item.eachTotalMoney ?? 0,
+  number: item.number ?? item.amount ?? 0,
+  shippedNumber: item.shippedNumber ?? item.number ?? item.amount ?? 0,
+}))
+
+const normalizeLogList = (source: any[] = []) => source.map((item: any) => ({
+  ...item,
+  createTime: item.createTime ?? item.createdTime ?? item.updateTime ?? item.updatedTime ?? 0,
+}))
+
+const normalizeOrderDetail = (source: any) => ({
+  ...source,
+  detailList: normalizeDetailList(source.detailList ?? source.merchantList ?? []),
+  orderLogs: normalizeLogList(Array.isArray(source.orderLogs) ? source.orderLogs : []),
+  phoneNumber: source.phoneNumber ?? source.addressDetail?.telephone ?? '',
+  userName: source.userName ?? source.addressDetail?.userName ?? '',
+  createTime: source.createTime ?? source.createdTime ?? 0,
+  updateTime: source.updateTime ?? source.updatedTime ?? 0,
+  payTime: source.payTime ?? source.paidTime ?? 0,
+})
+
 // 获取订单详情
 const getOrderDetailData = () => {
   state.loading = true
   getOrderDetail({
     id: router.currentRoute.value.query.orderId,
   }).then((res) => {
+    const detailData = normalizeOrderDetail(res)
+    state.detailList = detailData.detailList
+    state.address = normalizeAddress(res.orderReceiveDetail ?? res.addressDetail)
+    state.detail = detailData
+  }).finally(() => {
     state.loading = false
-    state.detailList = res.detailList.map((item: any) => {
-      item.shippedNumber = item.number
-      return item
-    })
-    state.address = res.orderReceiveDetail ? JSON.parse(res.orderReceiveDetail.address) : {}
-    state.detail = res
   })
 }
 

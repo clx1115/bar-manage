@@ -21,9 +21,15 @@ export function getOrderList(data: object) {
 //获取店铺订单详情
 export function getOrderDetail(data: any) {
   return request({
-    url: `/v1/shop/shop_orders/${data.id}/`,
+    url: `/v1/shop/orders/${data.id}/`,
     method: 'get',
-    data
+    params: {}
+  }).catch(() => {
+    return request({
+      url: `/v1/shop/shop_orders/${data.id}/`,
+      method: 'get',
+      params: {}
+    })
   })
 }
 //订单日志列表
