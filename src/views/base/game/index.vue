@@ -155,7 +155,6 @@ const state = reactive({
   formData: {} as any,
   rules: {
     gameName: [{ required: true, message: '请输入游戏名称', trigger: 'blur' }],
-    gameIcon: [{ required: true, message: '请上传游戏图标', trigger: 'change' }],
     gameType: [{ required: true, message: '请选择游戏类型', trigger: 'change' }],
     minPlayers: [{ required: true, message: '请输入最少人数', trigger: 'change' }],
     maxPlayers: [{ required: true, message: '请输入最大人数', trigger: 'change' }],
@@ -169,7 +168,7 @@ const createDefaultForm = () => ({
   gameId: undefined,
   gameName: '',
   gameDesc: '',
-  gameIcon: '',
+  gameIcon: '1',
   gameType: 1,
   minPlayers: 2,
   maxPlayers: 6,

@@ -50,7 +50,6 @@
             <el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="rewardTimeText" label="奖励时间" min-width="160" />
         <el-table-column prop="rewardOrderId" label="奖励订单ID" min-width="120" />
         <el-table-column prop="inviteDays" label="邀约天数" width="100" />
       </el-table>

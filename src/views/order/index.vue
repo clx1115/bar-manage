@@ -5,20 +5,9 @@
         <el-row>
           <el-form-item>
             <el-radio-group v-model="queryData.status" size="default" @change="getListData">
-              <el-radio-button :label="0">
-                全部
-              </el-radio-button>
-              <el-radio-button :label="10">
-                待付款
-                <el-badge :value="count.unpayOrders"></el-badge>
-              </el-radio-button>
-              <el-radio-button :label="20">
-                待发货
-                <el-badge :value="count.paidOrders"></el-badge>
-              </el-radio-button>
-              <el-radio-button :label="30">
-                待收货
-                <el-badge :value="count.delieveredOrders"></el-badge>
+              <el-radio-button v-for="item in orderStatusTabs" :key="item.value" :label="item.value">
+                {{ item.label }}
+                <el-badge v-if="getStatusCount(item.countKey) > 0" :value="getStatusCount(item.countKey)" />
               </el-radio-button>
             </el-radio-group>
           </el-form-item>
@@ -54,18 +43,7 @@
               value-format="x"
             />
           </el-form-item>
-          <el-form-item>
-            <el-date-picker
-              v-model="scheduleTimeRange"
-              size="default"
-              type="daterange"
-              range-separator="至"
-              start-placeholder="预约开始时间"
-              end-placeholder="预约结束时间"
-              format="YYYY-MM-DD"
-              value-format="x"
-            />
-          </el-form-item>
+
           <el-form-item>
             <el-button size="default" type="primary" @click="getListData">
               <el-icon>
@@ -82,14 +60,7 @@
               重置
             </el-button>
           </el-form-item>
-          <el-form-item v-if="userInfos.roles[0] === 'admin' || userInfos.roles[0] === 'director' || userInfos.roles[0] === 'finance' || userInfos.roles[0] === 'cashier'">
-            <el-button type="success" :disabled="!selectedList.length" @click="onBatchOrderDelievered()">
-              <el-icon>
-                <ele-Plus />
-              </el-icon>
-              批量发货
-            </el-button>
-          </el-form-item>
+
           <el-form-item>
             <el-button size="default" :loading="exportLoading" type="primary" @click="downloadFile">
               <el-icon>
@@ -179,15 +150,31 @@
             {{ formatDate(row.createTime, 'YYYY-mm-dd HH:MM:SS') }}
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="180">
+        <el-table-column fixed="right" label="操作" width="220" align="center">
           <template #default="{ row }">
-            <el-form>
-              <router-link :to="`/order/detail?orderId=${row.id}`" class="mr10">
-                <el-button size="small" text type="primary">详情</el-button>
+            <div class="order-actions">
+              <router-link :to="`/order/detail?orderId=${row.id}`">
+                <el-button size="small" text type="primary">{{ orderActionText.detail }}</el-button>
               </router-link>
-              <!-- <el-button v-if="userInfos.roles[0] === 'admin' || userInfos.roles[0] === 'director' || userInfos.roles[0] === 'finance' || userInfos.roles[0] === 'cashier'" size="small" text type="primary" @click="onPrintOrder(row)">打印订单</el-button> -->
-              <el-button v-if="row.status >= 10 && (userInfos.roles[0] === 'admin' || userInfos.roles[0] === 'director' || userInfos.roles[0] === 'finance' || userInfos.roles[0] === 'cashier')" size="small" text type="primary" @click="onCancelOrder(row)">取消订单</el-button>
-            </el-form>
+              <el-button
+                v-if="canMakeOrder(row)"
+                size="small"
+                text
+                type="primary"
+                @click="onMakeOrder(row)"
+              >
+                {{ orderActionText.make }}
+              </el-button>
+              <el-button
+                v-if="canFinishOrder(row)"
+                size="small"
+                text
+                type="primary"
+                @click="onFinishOrder(row)"
+              >
+                {{ orderActionText.finish }}
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -221,7 +208,7 @@ import {
   watch,
 } from 'vue'
 import { formatDate } from '@/utils/formatTime'
-import { listOrders, cancelOrder, batchOrderDelievered, getOrderCount, getPrintTemplate } from '@/api/order/index'
+import { listOrders, makeOrder, finishOrder, batchOrderDelievered, getOrderCount, getPrintTemplate } from '@/api/order/index'
 import { formatDeliveryType } from '@/dict/order'
 import { formatOrderStatus, parseMoney, formatAfterSalesStatus } from '@/utils/filters'
 import { ElMessageBox, ElMessage } from 'element-plus'
@@ -230,6 +217,29 @@ import { useUserInfo } from '@/stores/userInfo'
 
 const stores = useUserInfo()
 const { userInfos } = storeToRefs(stores) as any
+
+const orderActionText = {
+  detail: '\u8be6\u60c5',
+  make: '\u63a5\u5355',
+  finish: '\u5236\u4f5c\u5b8c\u6210',
+  printWarning: '\u6682\u65e0\u6253\u5370\u6a21\u677f',
+  makeConfirm: '\u786e\u5b9a\u63a5\u5355\u5e76\u6d41\u8f6c\u5230\u5f85\u5236\u4f5c\u5417\uff1f',
+  finishConfirm: '\u786e\u5b9a\u5c06\u8ba2\u5355\u8bbe\u4e3a\u5f85\u914d\u9001\u5417\uff1f',
+  confirmButton: '\u786e\u8ba4',
+  cancelButton: '\u53d6\u6d88',
+  dialogTitle: '\u63d0\u793a',
+  makeSuccess: '\u63a5\u5355\u6210\u529f',
+  finishSuccess: '\u5236\u4f5c\u5b8c\u6210',
+}
+
+const orderStatusTabs = [
+  { label: '全部', value: 0 },
+  { label: '待付款', value: 10, countKey: 'unpayOrders' },
+  { label: '已付款', value: 11, countKey: 'paidOrders' },
+  { label: '待制作', value: 20 },
+  { label: '已完成', value: 50 },
+  { label: '已取消', value: -10 },
+]
 
 const printOrder = defineAsyncComponent(
   () => import('./component/print.vue')
@@ -274,6 +284,11 @@ const state = reactive({
 
 const { list, loading, currentPage, totalPage, queryData, exportLoading, selectedList, count } =
   toRefs(state)
+
+const getStatusCount = (countKey?: string) => {
+  if (!countKey) return 0
+  return Number(state.count?.[countKey] || 0)
+}
 
 watch(timeRange, (newValue: any) => {
   if (newValue && newValue[0] && newValue[1]) {
@@ -362,9 +377,44 @@ const getPrintTemplateData = () => {
 
 const onPrintOrder = (row: any) => {
   if (!state.printTemplate) {
-    return ElMessage.warning('暂无打印模板')
+    return ElMessage.warning(orderActionText.printWarning)
   }
   printOrderRef.value.printOrder(state.printTemplate, row.id)
+}
+
+const canMakeOrder = (row: any) => row.status === 11
+const canFinishOrder = (row: any) => row.status === 20
+
+const onMakeOrder = (row: any) => {
+  ElMessageBox.confirm(orderActionText.makeConfirm, orderActionText.dialogTitle, {
+    confirmButtonText: orderActionText.confirmButton,
+    cancelButtonText: orderActionText.cancelButton,
+    type: 'warning',
+  })
+    .then(() => {
+      makeOrder({ orderId: row.id }).then(() => {
+        getListData()
+        getOrderCountData()
+        ElMessage.success(orderActionText.makeSuccess)
+      })
+    })
+    .catch(() => { })
+}
+
+const onFinishOrder = (row: any) => {
+  ElMessageBox.confirm(orderActionText.finishConfirm, orderActionText.dialogTitle, {
+    confirmButtonText: orderActionText.confirmButton,
+    cancelButtonText: orderActionText.cancelButton,
+    type: 'warning',
+  })
+    .then(() => {
+      finishOrder({ orderId: row.id }).then(() => {
+        getListData()
+        getOrderCountData()
+        ElMessage.success(orderActionText.finishSuccess)
+      })
+    })
+    .catch(() => { })
 }
 
 const refreshQuery = () => {
@@ -382,25 +432,6 @@ const handleCurrentChange = () => {
   getListData()
 }
 
-const onCancelOrder = (row: any) => {
-  ElMessageBox.confirm(
-    '您正在取消订单，是否继续?',
-    '提示',
-    {
-      confirmButtonText: '确认',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  )
-    .then(() => {
-      cancelOrder(row).then(() => {
-        getListData()
-        getOrderCountData()
-        ElMessage.success('取消成功')
-      })
-    })
-    .catch(() => { })
-}
 
 const onBatchOrderDelievered = () => {
   ElMessageBox.confirm(
@@ -551,5 +582,17 @@ defineExpose({
   height: 40px;
   display: flex;
   align-items: center;
+}
+
+.order-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.order-actions :deep(.el-button) {
+  margin: 0;
 }
 </style>

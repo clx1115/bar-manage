@@ -64,7 +64,7 @@
         <el-descriptions-item label="车牌号">{{ detailData.plateNumber }}</el-descriptions-item>
         <el-descriptions-item label="车主姓名">{{ detailData.ownerName }}</el-descriptions-item>
         <el-descriptions-item label="认证状态">{{ statusText(detailData.status) }}</el-descriptions-item>
-        <el-descriptions-item label="认证时间">{{ formatTime(detailData.auditTime) }}</el-descriptions-item>
+        <el-descriptions-item label="认证时间">{{ formatAuditTime(detailData) }}</el-descriptions-item>
         <el-descriptions-item label="备注" :span="2">{{ detailData.remark || '-' }}</el-descriptions-item>
         <el-descriptions-item label="拒绝原因" :span="2">{{ detailData.rejectReason || '-' }}</el-descriptions-item>
         <el-descriptions-item label="证件图片" :span="2">
@@ -116,6 +116,7 @@ const { list, loading, currentPage, pageSize, total, detailVisible, detailData, 
 const statusText = (value: number) => ({ 0: '待审核', 1: '已通过', 2: '已拒绝', 3: '已撤销' }[value] || '-')
 const statusTagType = (value: number) => ({ 0: 'warning', 1: 'success', 2: 'danger', 3: 'info' }[value] || 'info')
 const formatTime = (time?: number) => time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-'
+const formatAuditTime = (record: any) => formatTime(record?.auditTime || record?.createTime)
 
 const getListData = async () => {
   state.loading = true

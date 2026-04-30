@@ -198,7 +198,6 @@ const state = reactive({
   formData: {} as any,
   rules: {
     badgeName: [{ required: true, message: '请输入徽章名称', trigger: 'blur' }],
-    badgeIcon: [{ required: true, message: '请上传徽章图标', trigger: 'change' }],
     minScore: [{ required: true, message: '请输入最小分数', trigger: 'change' }],
     maxScore: [{ required: true, message: '请输入最大分数', trigger: 'change' }],
     level: [{ required: true, message: '请输入等级', trigger: 'change' }],
@@ -213,7 +212,7 @@ const { list, loading, currentPage, pageSize, total, multipleSelection, dialogVi
 const createDefaultForm = () => ({
   badgeId: undefined,
   badgeName: '',
-  badgeIcon: '',
+  badgeIcon: '1',
   minScore: 0,
   maxScore: 0,
   level: 1,

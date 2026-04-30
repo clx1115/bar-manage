@@ -51,19 +51,26 @@ export function orderDelievered(data: any) {
 }
 
 //后台取消订单
-export function cancelOrder(data: any) {
+
+//订单批量发货
+//make order
+export function makeOrder(data: any) {
   return request({
-    url: `/v1/shop/pos/orders/${data.id}/`,
+    url: '/v1/shop/make_order/',
     method: 'post',
-    data: {
-      orderId: data.id,
-      operation: 'cancel'
-    },
+    data,
   })
 }
 
+//finish order
+export function finishOrder(data: any) {
+  return request({
+    url: '/v1/shop/finish_order/',
+    method: 'post',
+    data,
+  })
+}
 
-//订单批量发货
 export function batchOrderDelievered(data: any) {
   return request({
     url: '/v1/shop/batch_order_delievered/',
