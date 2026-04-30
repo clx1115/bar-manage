@@ -79,15 +79,6 @@ export function batchOrderDelievered(data: any) {
   })
 }
 
-//获取订单状态统计
-export function getOrderCount() {
-  return request({
-    url: '/v1/shop/order_count/',
-    method: 'get',
-    params: {},
-  })
-}
-
 //获取打印订单模板
 export function getPrintTemplate(data: any) {
   return request({

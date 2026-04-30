@@ -8,9 +8,8 @@
               <el-radio-button :label="0">
                 全部
               </el-radio-button>
-              <el-radio-button :label="30">
+<el-radio-button :label="30">
                 待退款
-                <el-badge :value="count.toBeRefundedOrders" v-if="count.toBeRefundedOrders > 0"></el-badge>
               </el-radio-button>
               <el-radio-button :label="50">
                 已退款
@@ -107,7 +106,6 @@ export default {
     next((vm: any) => {
       if (from.name === 'afterSalesDetail') {
         vm.getListData()
-        vm.getOrderCountData()
       }
     })
   }
@@ -125,7 +123,6 @@ import {
 import { formatDate } from '@/utils/formatTime'
 import { getAfterSalesList } from '@/api/afterSales/index'
 import { formatAfterSalesStatus, parseMoney } from '@/utils/filters'
-import { getOrderCount } from '@/api/order/index'
 
 // 引入组件
 const directRefund = defineAsyncComponent(
@@ -149,11 +146,10 @@ const state = reactive({
   queryData: Object.assign({}, defaultQuery),
   submitData: {},
   exportLoading: false,
-  selectedList: [],
-  count: {} as any
+  selectedList: []
 })
 
-const { list, loading, currentPage, totalPage, queryData, exportLoading, selectedList, count } =
+const { list, loading, currentPage, totalPage, queryData, exportLoading, selectedList } =
   toRefs(state)
 
 watch(timeRange, (newValue: any) => {
@@ -188,12 +184,6 @@ const getListData = () => {
 }
 
 // 获取订单状态数量
-const getOrderCountData = () => {
-  getOrderCount().then((data: any) => {
-    state.count = data
-  })
-}
-
 //重置搜索条件
 const refreshQuery = () => {
   state.queryData = Object.assign({}, defaultQuery)
@@ -218,13 +208,11 @@ const handleCurrentChange = () => {
 // 页面加载时
 onMounted(() => {
   getListData()
-  getOrderCountData()
 })
 
 // 暴露变量
 defineExpose({
   getListData,
-  getOrderCountData
 })
 </script>
 

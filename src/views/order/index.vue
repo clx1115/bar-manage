@@ -7,7 +7,6 @@
             <el-radio-group v-model="queryData.status" size="default" @change="getListData">
               <el-radio-button v-for="item in orderStatusTabs" :key="item.value" :label="item.value">
                 {{ item.label }}
-                <el-badge v-if="getStatusCount(item.countKey) > 0" :value="getStatusCount(item.countKey)" />
               </el-radio-button>
             </el-radio-group>
           </el-form-item>
@@ -192,7 +191,6 @@ export default {
     next((vm: any) => {
       if (from.name === 'orderDetail') {
         vm.getListData()
-        vm.getOrderCountData()
       }
     })
   }
@@ -208,7 +206,7 @@ import {
   watch,
 } from 'vue'
 import { formatDate } from '@/utils/formatTime'
-import { listOrders, makeOrder, finishOrder, batchOrderDelievered, getOrderCount, getPrintTemplate } from '@/api/order/index'
+import { listOrders, makeOrder, finishOrder, batchOrderDelievered, getPrintTemplate } from '@/api/order/index'
 import { formatDeliveryType } from '@/dict/order'
 import { formatOrderStatus, parseMoney, formatAfterSalesStatus } from '@/utils/filters'
 import { ElMessageBox, ElMessage } from 'element-plus'
@@ -234,8 +232,8 @@ const orderActionText = {
 
 const orderStatusTabs = [
   { label: '全部', value: 0 },
-  { label: '待付款', value: 10, countKey: 'unpayOrders' },
-  { label: '已付款', value: 11, countKey: 'paidOrders' },
+  { label: '待付款', value: 10 },
+  { label: '已付款', value: 11 },
   { label: '待制作', value: 20 },
   { label: '已完成', value: 50 },
   { label: '已取消', value: -10 },
@@ -278,17 +276,11 @@ const state = reactive({
   submitData: Object.assign({}, defaultQuery),
   exportLoading: false,
   selectedList: [] as any[],
-  count: {} as any,
   printTemplate: ''
 })
 
-const { list, loading, currentPage, totalPage, queryData, exportLoading, selectedList, count } =
+const { list, loading, currentPage, totalPage, queryData, exportLoading, selectedList } =
   toRefs(state)
-
-const getStatusCount = (countKey?: string) => {
-  if (!countKey) return 0
-  return Number(state.count?.[countKey] || 0)
-}
 
 watch(timeRange, (newValue: any) => {
   if (newValue && newValue[0] && newValue[1]) {
@@ -360,12 +352,6 @@ const getListData = () => {
     })
 }
 
-const getOrderCountData = () => {
-  getOrderCount().then((data: any) => {
-    state.count = data
-  })
-}
-
 const getPrintTemplateData = () => {
   getPrintTemplate({ page: 1 }).then((data: any) => {
     const printTemplateData = data.list.find((item: any) => item.title === '销售出库单')
@@ -394,7 +380,6 @@ const onMakeOrder = (row: any) => {
     .then(() => {
       makeOrder({ orderId: row.id }).then(() => {
         getListData()
-        getOrderCountData()
         ElMessage.success(orderActionText.makeSuccess)
       })
     })
@@ -410,7 +395,6 @@ const onFinishOrder = (row: any) => {
     .then(() => {
       finishOrder({ orderId: row.id }).then(() => {
         getListData()
-        getOrderCountData()
         ElMessage.success(orderActionText.finishSuccess)
       })
     })
@@ -456,7 +440,6 @@ const onBatchOrderDelievered = () => {
         list,
       }).then(() => {
         getListData()
-        getOrderCountData()
         ElMessage.success('批量发货成功')
       })
     })
@@ -567,13 +550,11 @@ const downloadFile = () => {
 
 onMounted(() => {
   getListData()
-  getOrderCountData()
   getPrintTemplateData()
 })
 
 defineExpose({
   getListData,
-  getOrderCountData
 })
 </script>
 

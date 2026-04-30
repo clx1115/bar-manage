@@ -131,6 +131,19 @@ const state = reactive({
 const { loading, detail, detailList } = toRefs(state)
 const router = useRouter()
 
+const normalizeDetailList = (res: any) => {
+  const source = Array.isArray(res.orderReturnsDetailList) && res.orderReturnsDetailList.length
+    ? res.orderReturnsDetailList
+    : Array.isArray(res.orderDetailList)
+      ? res.orderDetailList
+      : []
+
+  return source.map((item: any) => ({
+    ...item,
+    returnAmount: item.returnAmount ?? item.returnNumber ?? item.number ?? 0,
+  }))
+}
+
 // 获取订单详情
 const getOrderDetailData = () => {
   state.loading = true
@@ -139,7 +152,7 @@ const getOrderDetailData = () => {
   }).then((res) => {
     state.loading = false
     state.detail = res
-    state.detailList = res.orderReturnsDetailList
+    state.detailList = normalizeDetailList(res)
   })
 }
 
