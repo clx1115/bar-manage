@@ -4,9 +4,12 @@
       <div class="page-intro">
         <div>
           <div class="page-intro__title">拼桌记录</div>
-          <div class="page-intro__desc">查看拼桌邀请流转状态，核对处理结果，并在已接受场景下执行分离操作。</div>
+          <div class="page-intro__desc">
+            查看拼桌邀请流转状态，核对处理结果，并在已接受场景下执行分离操作。
+          </div>
         </div>
       </div>
+
       <el-form class="query" :inline="true">
         <el-form-item>
           <el-button type="primary" @click="getListData">
@@ -16,12 +19,13 @@
         </el-form-item>
       </el-form>
 
-      <el-table :data="list" v-loading="loading">
+      <el-table :data="list" v-loading="loading" style="width: 100%">
         <el-table-column prop="id" label="ID" width="90" />
-        <el-table-column prop="initiatorUserId" label="邀请方用户" width="110" />
-        <el-table-column prop="initiatorTableId" label="邀请方桌位" width="110" />
-        <el-table-column prop="inviteeUserId" label="接受方用户" width="110" />
-        <el-table-column prop="inviteeTableId" label="接受方桌位" width="110" />
+        <el-table-column prop="orgId" label="组织ID" width="100" />
+        <el-table-column prop="initiatorUserId" label="邀请方用户" width="120" />
+        <el-table-column prop="initiatorTableId" label="邀请方桌位" width="120" />
+        <el-table-column prop="inviteeUserId" label="接受方用户" width="120" />
+        <el-table-column prop="inviteeTableId" label="接受方桌位" width="120" />
         <el-table-column label="拼桌模式" width="120">
           <template #default="{ row }">{{ mergeModeText(row.mergeMode) }}</template>
         </el-table-column>
@@ -40,7 +44,9 @@
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button text type="primary" @click="openDetail(row.id)">详情</el-button>
-            <el-button text type="warning" :disabled="row.status !== 20" @click="onSeparate(row.id)">分离</el-button>
+            <el-button text type="warning" :disabled="row.status !== 20" @click="onSeparate(row.id)">
+              分离
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -60,7 +66,7 @@
     </el-card>
 
     <el-dialog title="拼桌详情" v-model="detailVisible" width="680px">
-      <el-descriptions :column="2" border v-if="detailData.id">
+      <el-descriptions v-if="detailData.id" :column="2" border>
         <el-descriptions-item label="ID">{{ detailData.id }}</el-descriptions-item>
         <el-descriptions-item label="组织ID">{{ detailData.orgId }}</el-descriptions-item>
         <el-descriptions-item label="邀请方用户">{{ detailData.initiatorUserId }}</el-descriptions-item>
@@ -73,6 +79,8 @@
         <el-descriptions-item label="处理时间">{{ formatTime(detailData.acceptTime) }}</el-descriptions-item>
         <el-descriptions-item label="拒绝原因" :span="2">{{ detailData.rejectReason || '-' }}</el-descriptions-item>
         <el-descriptions-item label="邀请信息" :span="2">{{ detailData.message || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ formatTime(detailData.createdTime) }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ formatTime(detailData.updateTime) }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -99,14 +107,14 @@ const { list, loading, currentPage, pageSize, total, detailVisible, detailData }
 const mergeModeText = (value: number) => ({ 10: '消费分离', 20: '消费合并' }[value] || '-')
 const statusText = (value: number) => ({ 10: '待处理', 20: '已接受', 30: '已拒绝', 40: '已取消', 50: '已过期' }[value] || '-')
 const statusTagType = (value: number) => ({ 10: 'warning', 20: 'success', 30: 'danger', 40: 'info', 50: 'info' }[value] || 'info')
-const formatTime = (time?: number) => time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-'
+const formatTime = (time?: number) => (time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-')
 
 const getListData = async () => {
   state.loading = true
   try {
     const data = await getTableMergeList({ page: state.currentPage, size: state.pageSize })
     state.list = data.list || []
-    state.total = (data.pages || 0) * state.pageSize
+    state.total = data.total || (data.pages || 0) * state.pageSize
   } finally {
     state.loading = false
   }
@@ -123,15 +131,23 @@ const openDetail = async (id: number) => {
   state.detailVisible = true
 }
 
-const onSeparate = (id: number) => {
-  ElMessageBox.confirm('确认对该拼桌记录执行分离吗？', '提示', { type: 'warning' })
-    .then(async () => {
-      const data = await getTableMergeDetail(id)
-      await separateTableMerge(id, data)
-      ElMessage.success('分离成功')
-      getListData()
+const onSeparate = async (id: number) => {
+  try {
+    await ElMessageBox.confirm('确认对该拼桌记录执行分离吗？', '提示', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
     })
-    .catch(() => {})
+    const detail = await getTableMergeDetail(id)
+    await separateTableMerge(id, detail)
+    ElMessage.success('分离成功')
+    if (state.detailVisible && state.detailData.id === id) {
+      state.detailData = await getTableMergeDetail(id)
+    }
+    getListData()
+  } catch (error) {
+    // 用户取消时静默处理
+  }
 }
 
 onMounted(() => {

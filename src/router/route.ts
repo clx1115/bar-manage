@@ -467,10 +467,25 @@ export const dynamicRoutes : Array<RouteRecordRaw> = [
 					icon: 'ele-Present',
 				},
 				children: [
+  					{
+						path: '/freebie/gift',
+						name: 'freebieGift',
+						component: () => import('@/views/freebie/gift/index.vue'),
+						meta: {
+							title: '礼物管理',
+							isLink: '',
+							isHide: false,
+							isKeepAlive: true,
+							isAffix: false,
+							isIframe: false,
+							roles: ['admin', 'director'],
+							icon: 'ele-Present',
+						},
+					},
 					{
-						path: '/freebie/config',
-						name: 'freebieConfig',
-						component: () => import('@/views/freebie/config/index.vue'),
+ 						path: '/freebie/config',
+ 						name: 'freebieConfig',
+ 						component: () => import('@/views/freebie/config/index.vue'),
 						meta: {
 							title: '礼品配置',
 							isLink: '',
