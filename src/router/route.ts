@@ -845,6 +845,21 @@ export const dynamicRoutes : Array<RouteRecordRaw> = [
 						},
 					},
 					{
+						path: '/member/scoreRank',
+						name: 'memberScoreRank',
+						component: () => import('@/views/member/scoreRank/index.vue'),
+						meta: {
+							title: '排行榜管理',
+							isLink: '',
+							isHide: false,
+							isKeepAlive: true,
+							isAffix: false,
+							isIframe: false,
+							roles: ['admin'],
+							icon: 'ele-Histogram',
+						},
+					},
+					{
 						path: '/member/detail',
 						name: 'memberDetail',
 						component: () => import('@/views/member/detail/index.vue'),
