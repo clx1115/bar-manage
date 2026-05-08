@@ -10,6 +10,7 @@ export const useUserInfo = defineStore('userInfo', {
   state: (): UserInfoState => ({
     token: '',
     userInfos: {
+      id: 0,
       name: '',
       avatar: '',
       roles: [],
@@ -31,6 +32,7 @@ export const useUserInfo = defineStore('userInfo', {
         getUserInfo()
           .then((res: any) => {
             const userInfos = {
+              id: res.id || res.uid || 0,
               name: res.realName,
               avatar: res.avatar,
               roles: [res.rules],
@@ -55,6 +57,7 @@ export const useUserInfo = defineStore('userInfo', {
             const { token, realName, avatar, rules } = response
             Session.setString('token', token)
             const userInfos = {
+              id: response.id || response.uid || 0,
               name: response.realName,
               avatar: response.avatar,
               roles: [response.rules || 'admin'],
