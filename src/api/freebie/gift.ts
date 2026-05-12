@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getGiftList(data: any) {
   return request({
-    url: '/v1/cp/gift_list/',
+    url: '/v1/p/gift_list/',
     method: 'post',
     data,
   })
