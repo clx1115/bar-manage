@@ -32,6 +32,14 @@
               批量删除
             </el-button>
           </el-form-item>
+          <el-form-item>
+            <el-button size="default" type="primary" plain @click="onExportQrCode">
+              <el-icon>
+                <ele-Download />
+              </el-icon>
+              导出二维码
+            </el-button>
+          </el-form-item>
         </el-row>
       </el-form>
 
@@ -65,6 +73,7 @@
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button size="small" text type="primary" @click="onOpenAdd('edit', row)">编辑</el-button>
+            <el-button size="small" text type="primary" @click="onExportSingleQrCode(row)">导出二维码</el-button>
             <el-button size="small" text type="danger" @click="onRowDel(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -92,6 +101,9 @@
 import { defineAsyncComponent, onMounted, reactive, ref, toRefs } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import dayjs from 'dayjs'
+import QRCode from 'qrcode'
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
 import { deleteAreaTable, getAreaTableList } from '@/api/base/table/index'
 
 const detailDialog = defineAsyncComponent(() => import('./component/detail.vue'))
@@ -107,6 +119,139 @@ const state = reactive({
 })
 
 const { list, loading, currentPage, pageSize, total, multipleSelection } = toRefs(state)
+
+const QR_CARD_WIDTH = 1024
+const QR_CARD_HEIGHT = 1024
+const QR_SIZE = 480
+const QR_Y = 260
+const QR_BASE_URL = 'https://r.xcx100.info/table'
+
+const escapeFileName = (value: string) => value.replace(/[\\/:*?"<>|]/g, '_')
+
+const getQrCodeText = (row: any) => {
+  const tableId = row?.id
+  return tableId ? `${QR_BASE_URL}?tableId=${tableId}` : ''
+}
+
+const getQrCodeTitle = (row: any) => {
+  const tableNum = row?.tableNum || '-'
+  return `桌号：${tableNum}`
+}
+
+const getQrCodeAreaText = (row: any) => {
+  return `区域名称：${row?.name || '-'}`
+}
+
+const createQrCardDataUrl = async (row: any) => {
+  const qrValue = getQrCodeText(row)
+  if (!qrValue) throw new Error('二维码内容为空')
+
+  const qrDataUrl = await QRCode.toDataURL(qrValue, {
+    width: QR_SIZE,
+    margin: 1,
+    color: {
+      dark: '#111827',
+      light: '#ffffff',
+    },
+  })
+
+  const qrImage = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error('二维码图片加载失败'))
+    image.src = qrDataUrl
+  })
+
+  const canvas = document.createElement('canvas')
+  canvas.width = QR_CARD_WIDTH
+  canvas.height = QR_CARD_HEIGHT
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('画布创建失败')
+
+  ctx.fillStyle = '#f5f7fb'
+  ctx.fillRect(0, 0, QR_CARD_WIDTH, QR_CARD_HEIGHT)
+
+  ctx.fillStyle = '#ffffff'
+  roundRect(ctx, 92, 80, 840, 860, 32)
+  ctx.fill()
+
+  ctx.fillStyle = '#111827'
+  ctx.textAlign = 'center'
+  ctx.font = 'bold 52px Microsoft YaHei'
+  ctx.fillText('桌位二维码', QR_CARD_WIDTH / 2, 170)
+
+  ctx.font = '36px Microsoft YaHei'
+  ctx.fillStyle = '#4b5563'
+  ctx.fillText(getQrCodeTitle(row), QR_CARD_WIDTH / 2, 230)
+
+  const qrX = Math.floor((QR_CARD_WIDTH - QR_SIZE) / 2)
+  ctx.drawImage(qrImage, qrX, QR_Y, QR_SIZE, QR_SIZE)
+
+  ctx.fillStyle = '#111827'
+  ctx.font = 'bold 42px Microsoft YaHei'
+  ctx.fillText(getQrCodeTitle(row), QR_CARD_WIDTH / 2, 820)
+
+  ctx.fillStyle = '#6b7280'
+  ctx.font = '28px Microsoft YaHei'
+  ctx.fillText(getQrCodeAreaText(row), QR_CARD_WIDTH / 2, 880)
+
+  return canvas.toDataURL('image/png')
+}
+
+const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) => {
+  ctx.beginPath()
+  ctx.moveTo(x + radius, y)
+  ctx.lineTo(x + width - radius, y)
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius)
+  ctx.lineTo(x + width, y + height - radius)
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
+  ctx.lineTo(x + radius, y + height)
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
+  ctx.lineTo(x, y + radius)
+  ctx.quadraticCurveTo(x, y, x + radius, y)
+  ctx.closePath()
+}
+
+const exportRowsAsQrZip = async (rows: any[]) => {
+  if (!rows.length) {
+    ElMessage.warning('没有可导出的桌位数据')
+    return
+  }
+
+  state.loading = true
+  try {
+    const zip = new JSZip()
+    const folder = zip.folder('table-qrcodes')
+    const summary: string[] = []
+
+    for (let index = 0; index < rows.length; index += 1) {
+      const row = rows[index]
+      const dataUrl = await createQrCardDataUrl(row)
+      const base64 = dataUrl.split(',')[1]
+      const fileName = `${escapeFileName(getQrCodeTitle(row))}.png`
+      folder?.file(fileName, base64, { base64: true })
+      summary.push(`${index + 1}. ${getQrCodeTitle(row)} | 链接: ${getQrCodeText(row)}`)
+    }
+
+    folder?.file(
+      'README.txt',
+      ['桌位二维码导出', `生成时间: ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`, `总数: ${rows.length}`, '', ...summary].join('\n')
+    )
+
+    const blob = await zip.generateAsync({
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 },
+    })
+    saveAs(blob, `桌位二维码_${dayjs().format('YYYYMMDDHHmmss')}.zip`)
+    ElMessage.success('二维码导出成功')
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('二维码导出失败')
+  } finally {
+    state.loading = false
+  }
+}
 
 const getListData = () => {
   state.loading = true
@@ -138,6 +283,31 @@ const handleCurrentChange = () => {
 
 const handleSelectionChange = (rows: any[]) => {
   state.multipleSelection = rows
+}
+
+const onExportSingleQrCode = async (row: any) => {
+  await exportRowsAsQrZip([row])
+}
+
+const onExportQrCode = () => {
+  ElMessageBox.confirm('确认导出当前勾选的桌位二维码吗？点击取消将导出当前列表全部数据。', '导出二维码', {
+    confirmButtonText: '导出勾选数据',
+    cancelButtonText: '导出全部数据',
+    distinguishCancelAndClose: true,
+    type: 'success',
+  })
+    .then(() => {
+      if (!state.multipleSelection.length) {
+        ElMessage.warning('请先勾选要导出的桌位')
+        return
+      }
+      exportRowsAsQrZip(state.multipleSelection)
+    })
+    .catch((action) => {
+      if (action === 'cancel') {
+        exportRowsAsQrZip(state.list)
+      }
+    })
 }
 
 const getStatusText = (status: number) => {
