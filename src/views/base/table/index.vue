@@ -124,13 +124,14 @@ const QR_CARD_WIDTH = 1024
 const QR_CARD_HEIGHT = 1024
 const QR_SIZE = 480
 const QR_Y = 260
-const QR_BASE_URL = 'https://r.xcx100.info/table'
+const QR_BASE_URL = 'https://r.xcx100.info/table/index.html'
 
 const escapeFileName = (value: string) => value.replace(/[\\/:*?"<>|]/g, '_')
 
 const getQrCodeText = (row: any) => {
   const tableId = row?.id
-  return tableId ? `${QR_BASE_URL}?tableId=${tableId}` : ''
+  const tableNo = row?.tableNum
+  return tableId ? `${QR_BASE_URL}?tableId=${tableId}&&tableNo=${tableNo ?? ''}` : ''
 }
 
 const getQrCodeTitle = (row: any) => {
