@@ -1,14 +1,21 @@
 <template>
   <div class="page-container layout-padding">
     <el-card shadow="hover" class="layout-padding-auto">
+      <div class="page-intro">
+        <div>
+          <div class="page-intro__title">领取记录</div>
+          <div class="page-intro__desc">查看免费领取和积分兑换记录，支持按会员、领取类型和时间范围筛选。</div>
+        </div>
+      </div>
+
       <el-form class="query" :inline="true">
         <el-form-item label="会员ID">
-          <el-input v-model="queryData.memberId" placeholder="0或留空表示全部" clearable />
+          <el-input v-model="queryData.memberId" placeholder="0 或留空表示全部" clearable />
         </el-form-item>
         <el-form-item label="领取类型">
-          <el-select v-model="queryData.type" placeholder="全部" clearable style="width: 160px">
-            <el-option label="免费领取" :value="1" />
-            <el-option label="积分兑换" :value="2" />
+          <el-select v-model="queryData.type" placeholder="全部" clearable class="w160">
+            <el-option label="免费领取" :value="0" />
+            <el-option label="积分兑换" :value="1" />
           </el-select>
         </el-form-item>
         <el-form-item label="时间范围">
@@ -23,7 +30,7 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="getListData" :loading="loading">
+          <el-button type="primary" :loading="loading" @click="getListData">
             <el-icon><ele-Search /></el-icon>
             查询
           </el-button>
@@ -48,8 +55,8 @@
         <el-table-column prop="phoneNumber" label="手机号" width="140" />
         <el-table-column label="领取类型" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.type === 1 ? 'success' : 'warning'">
-              {{ row.type === 1 ? '免费领取' : '积分兑换' }}
+            <el-tag :type="row.type === 0 ? 'success' : 'warning'">
+              {{ row.type === 0 ? '免费领取' : '积分兑换' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -72,10 +79,13 @@
       <div class="page-bottom">
         <el-pagination
           v-model:currentPage="currentPage"
+          v-model:page-size="pageSize"
           background
-          layout="prev, pager, next, jumper"
-          :page-count="totalPage"
+          layout="total, sizes, prev, pager, next, jumper"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
           @current-change="getListData"
+          @size-change="onSizeChange"
         />
       </div>
     </el-card>
@@ -99,12 +109,13 @@ const state = reactive({
   list: [] as any[],
   loading: false,
   currentPage: 1,
-  totalPage: 1,
+  pageSize: 20,
+  total: 0,
   queryData: { ...defaultQuery },
   submitData: {},
 })
 
-const { list, loading, currentPage, totalPage, queryData } = toRefs(state)
+const { list, loading, currentPage, pageSize, total, queryData } = toRefs(state)
 
 watch(timeRange, (value: any) => {
   if (value?.[0] && value?.[1]) {
@@ -124,25 +135,28 @@ const getListData = async () => {
     }
     const payload: any = {
       page: state.currentPage,
-      size: 20,
+      size: state.pageSize,
       memberId: Number(state.queryData.memberId) || 0,
     }
-    if (state.queryData.type !== '') {
-      payload.type = state.queryData.type
-    }
-    if (state.queryData.startTime) {
-      payload.startTime = state.queryData.startTime
-    }
-    if (state.queryData.endTime) {
-      payload.endTime = state.queryData.endTime
-    }
+    if (state.queryData.type !== '') payload.type = state.queryData.type
+    if (state.queryData.startTime) payload.startTime = state.queryData.startTime
+    if (state.queryData.endTime) payload.endTime = state.queryData.endTime
+
     const data = await getFreebieRecordList(payload)
     state.list = data.list || []
-    state.totalPage = data.pages || 1
+    state.total = data.total || (data.pages || 0) * state.pageSize
+    if (!state.total && state.currentPage === 1 && state.list.length < state.pageSize) {
+      state.total = state.list.length
+    }
     state.submitData = JSON.parse(JSON.stringify(state.queryData))
   } finally {
     state.loading = false
   }
+}
+
+const onSizeChange = () => {
+  state.currentPage = 1
+  getListData()
 }
 
 const resetQuery = () => {
@@ -157,10 +171,49 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.page-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border: 1px solid #e7eef7;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8fbff 0%, #f5fff6 100%);
+}
+
+.page-intro__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2d3d;
+}
+
+.page-intro__desc {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #667085;
+}
+
+.query :deep(.el-form-item) {
+  margin-right: 12px;
+  margin-bottom: 12px;
+}
+
+.page-bottom {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
 .avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.w160 {
+  width: 160px;
 }
 </style>

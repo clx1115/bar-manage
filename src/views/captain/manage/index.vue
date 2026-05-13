@@ -1,12 +1,19 @@
 <template>
   <div class="page-container layout-padding">
     <el-card shadow="hover" class="layout-padding-auto">
+      <div class="page-intro">
+        <div>
+          <div class="page-intro__title">团长管理</div>
+          <div class="page-intro__desc">查看团长状态、成员规模和收益情况，支持批量配置佣金比例及封禁解封操作。</div>
+        </div>
+      </div>
+
       <el-form class="query" :inline="true">
         <el-form-item label="关键词">
-          <el-input v-model="queryData.keyword" placeholder="搜索手机号/姓名" clearable />
+          <el-input v-model="queryData.keyword" placeholder="搜索手机号或姓名" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="getListData" :loading="loading">
+          <el-button type="primary" :loading="loading" @click="getListData">
             <el-icon><ele-Search /></el-icon>
             查询
           </el-button>
@@ -18,14 +25,10 @@
           </el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="success" @click="openCommissionDialog('selected')">
-            批量设置佣金
-          </el-button>
+          <el-button type="success" @click="openCommissionDialog('selected')">批量设置佣金</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="warning" @click="openCommissionDialog('all')">
-            统一设置全店佣金
-          </el-button>
+          <el-button type="warning" @click="openCommissionDialog('all')">统一设置全店佣金</el-button>
         </el-form-item>
       </el-form>
 
@@ -52,12 +55,16 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
-            <el-button text type="primary" size="small" @click="openCommissionDialog('selected', row)">
-              设置佣金
-            </el-button>
-            <el-button text type="danger" size="small" @click="toggleBan(row)">
+            <el-button text type="primary" size="small" @click="openCommissionDialog('selected', row)">设置佣金</el-button>
+            <el-button
+              v-if="canToggleBan(row.status)"
+              text
+              :type="row.status === 3 ? 'warning' : 'danger'"
+              size="small"
+              @click="toggleBan(row)"
+            >
               {{ row.status === 3 ? '解封' : '封禁' }}
             </el-button>
           </template>
@@ -67,10 +74,13 @@
       <div class="page-bottom">
         <el-pagination
           v-model:currentPage="currentPage"
+          v-model:page-size="pageSize"
           background
-          layout="prev, pager, next, jumper"
-          :page-count="totalPage"
+          layout="total, sizes, prev, pager, next, jumper"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
           @current-change="getListData"
+          @size-change="onSizeChange"
         />
       </div>
     </el-card>
@@ -98,9 +108,7 @@
       </el-form>
       <template #footer>
         <el-button @click="dialog.visible = false">取消</el-button>
-        <el-button type="primary" @click="submitCommission" :loading="dialog.loading">
-          确认
-        </el-button>
+        <el-button type="primary" :loading="dialog.loading" @click="submitCommission">确认</el-button>
       </template>
     </el-dialog>
   </div>
@@ -124,7 +132,8 @@ const state = reactive({
   list: [] as any[],
   loading: false,
   currentPage: 1,
-  totalPage: 1,
+  pageSize: 20,
+  total: 0,
   queryData: { ...defaultQuery },
   submitData: {},
   selectedIds: [] as number[],
@@ -137,7 +146,7 @@ const state = reactive({
   },
 })
 
-const { list, loading, currentPage, totalPage, queryData, dialog } = toRefs(state)
+const { list, loading, currentPage, pageSize, total, queryData, dialog } = toRefs(state)
 
 const statusText = (status: number) => {
   if (status === 0) return '待审核'
@@ -154,18 +163,25 @@ const statusTagType = (status: number) => {
   return 'info'
 }
 
+const canToggleBan = (status: number) => status === 1 || status === 3
+
 const formatCommissionRate = (row: any) => {
   const rawValue = row.commissionRate ?? row.commission_ratio ?? row.ratio ?? row.commission
   if (rawValue === undefined || rawValue === null || rawValue === '') return '-'
 
   const value = Number(rawValue)
   if (Number.isNaN(value)) return rawValue
-
-  if (value <= 1) {
-    return `${(value * 100).toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}%`
-  }
-
+  if (value <= 1) return `${(value * 100).toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}%`
   return `${value.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}%`
+}
+
+const extractCommissionRate = (row?: any) => {
+  if (!row) return 0
+  const rawValue = row.commissionRate ?? row.commission_ratio ?? row.ratio ?? row.commission
+  if (rawValue === undefined || rawValue === null || rawValue === '') return 0
+  const value = Number(rawValue)
+  if (Number.isNaN(value)) return 0
+  return value <= 1 ? Number((value * 100).toFixed(2)) : value
 }
 
 const getListData = async () => {
@@ -176,15 +192,23 @@ const getListData = async () => {
     }
     const data = await getCaptainList({
       page: state.currentPage,
-      size: 20,
+      size: state.pageSize,
       keyword: state.queryData.keyword,
     })
     state.list = data.list || []
-    state.totalPage = data.pages || 1
+    state.total = data.total || (data.pages || 0) * state.pageSize
+    if (!state.total && state.currentPage === 1 && state.list.length < state.pageSize) {
+      state.total = state.list.length
+    }
     state.submitData = JSON.parse(JSON.stringify(state.queryData))
   } finally {
     state.loading = false
   }
+}
+
+const onSizeChange = () => {
+  state.currentPage = 1
+  getListData()
 }
 
 const resetQuery = () => {
@@ -206,7 +230,7 @@ const openCommissionDialog = (mode: 'selected' | 'all', row?: any) => {
     visible: true,
     mode,
     ids,
-    commissionRate: 0,
+    commissionRate: extractCommissionRate(row),
     loading: false,
   }
 }
@@ -257,6 +281,41 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.page-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border: 1px solid #e7eef7;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8fbff 0%, #fff8f1 100%);
+}
+
+.page-intro__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2d3d;
+}
+
+.page-intro__desc {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #667085;
+}
+
+.query :deep(.el-form-item) {
+  margin-right: 12px;
+  margin-bottom: 12px;
+}
+
+.page-bottom {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
 .w100 {
   width: 100%;
 }

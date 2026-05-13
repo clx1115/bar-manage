@@ -1,20 +1,35 @@
 <template>
   <div class="page-container layout-padding">
     <el-card shadow="hover" class="layout-padding-auto">
+      <div class="page-intro">
+        <div>
+          <div class="page-intro__title">风控封禁</div>
+          <div class="page-intro__desc">支持查询会员封禁状态、封禁与解封、查看封禁列表和风险处理记录。</div>
+        </div>
+      </div>
+
       <el-form class="query" :inline="true">
         <el-form-item label="会员ID">
-          <el-input v-model="memberId" placeholder="输入会员ID后可查状态或操作" clearable />
+          <el-input v-model="memberId" placeholder="输入会员ID后可查询状态或筛选" clearable />
+        </el-form-item>
+        <el-form-item label="状态筛选">
+          <el-select v-model="statusFilter" class="w160">
+            <el-option label="封禁和风险" :value="undefined" />
+            <el-option label="封禁" :value="1" />
+            <el-option label="风险" :value="3" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="关键词">
+          <el-input v-model="keyword" placeholder="搜索昵称或电话" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="checkStatus" :loading="statusLoading">
-            查询封禁状态
-          </el-button>
+          <el-button type="primary" :loading="statusLoading" @click="checkStatus">查询封禁状态</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button @click="loadBannedList" :loading="bannedLoading">查询封禁列表</el-button>
+          <el-button :loading="bannedLoading" @click="loadBannedList">查询封禁列表</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button @click="loadRecordList" :loading="recordLoading">查询操作记录</el-button>
+          <el-button :loading="recordLoading" @click="loadRecordList">查询操作记录</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="danger" @click="openActionDialog('ban')">封禁用户</el-button>
@@ -47,7 +62,7 @@
         </el-descriptions-item>
       </el-descriptions>
 
-      <div class="section-title">当前被封禁用户</div>
+      <div class="section-title">当前封禁/风险用户</div>
       <el-table :data="bannedList" v-loading="bannedLoading" style="width: 100%">
         <el-table-column prop="id" label="风险ID" width="100" />
         <el-table-column prop="memberId" label="会员ID" width="110" />
@@ -58,33 +73,37 @@
             <img v-if="row.avatar" :src="row.avatar" class="avatar" />
           </template>
         </el-table-column>
+        <el-table-column label="状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'danger' : 'warning'">
+              {{ row.status === 1 ? '封禁' : '风险' }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="封禁到期时间" width="180">
           <template #default="{ row }">
-            {{ formatDate(row.banExpireTime, 'YYYY-mm-dd HH:MM:SS') }}
+            {{ row.banExpireTime ? formatDate(row.banExpireTime, 'YYYY-mm-dd HH:MM:SS') : '-' }}
           </template>
         </el-table-column>
         <el-table-column prop="banReason" label="封禁原因" min-width="180" show-overflow-tooltip />
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
-            <el-button text type="primary" size="small" @click="checkStatus(row.memberId)">
-              查状态
-            </el-button>
-            <el-button text type="primary" size="small" @click="focusRecords(row.memberId)">
-              查记录
-            </el-button>
-            <el-button text type="danger" size="small" @click="openActionDialog('unban', row)">
-              解封
-            </el-button>
+            <el-button text type="primary" size="small" @click="checkStatus(row.memberId)">查状态</el-button>
+            <el-button text type="primary" size="small" @click="focusRecords(row.memberId)">查记录</el-button>
+            <el-button v-if="row.status === 1" text type="danger" size="small" @click="openActionDialog('unban', row)">解封</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="page-bottom">
         <el-pagination
           v-model:currentPage="bannedPage"
+          v-model:page-size="bannedPageSize"
           background
-          layout="prev, pager, next, jumper"
-          :page-count="bannedTotalPage"
+          layout="total, sizes, prev, pager, next, jumper"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="bannedTotal"
           @current-change="loadBannedList"
+          @size-change="onBannedSizeChange"
         />
       </div>
 
@@ -115,10 +134,13 @@
       <div class="page-bottom">
         <el-pagination
           v-model:currentPage="recordPage"
+          v-model:page-size="recordPageSize"
           background
-          layout="prev, pager, next, jumper"
-          :page-count="recordTotalPage"
+          layout="total, sizes, prev, pager, next, jumper"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="recordTotal"
           @current-change="loadRecordList"
+          @size-change="onRecordSizeChange"
         />
       </div>
     </el-card>
@@ -134,12 +156,7 @@
           <el-input v-model="dialog.form.memberId" placeholder="请输入会员ID" />
         </el-form-item>
         <el-form-item label="原因" required>
-          <el-input
-            v-model="dialog.form.reason"
-            type="textarea"
-            :rows="3"
-            placeholder="请输入原因"
-          />
+          <el-input v-model="dialog.form.reason" type="textarea" :rows="3" placeholder="请输入操作原因" />
         </el-form-item>
         <el-form-item v-if="dialog.mode === 'ban'" label="到期时间" required>
           <el-date-picker
@@ -153,9 +170,7 @@
       </el-form>
       <template #footer>
         <el-button @click="dialog.visible = false">取消</el-button>
-        <el-button type="primary" @click="submitAction" :loading="dialog.loading">
-          确认
-        </el-button>
+        <el-button type="primary" :loading="dialog.loading" @click="submitAction">确认</el-button>
       </template>
     </el-dialog>
   </div>
@@ -175,16 +190,20 @@ import {
 
 const state = reactive({
   memberId: '',
+  keyword: '',
+  statusFilter: undefined as number | undefined,
   statusLoading: false,
   statusInfo: null as any,
   bannedLoading: false,
   bannedList: [] as any[],
   bannedPage: 1,
-  bannedTotalPage: 1,
+  bannedPageSize: 20,
+  bannedTotal: 0,
   recordLoading: false,
   recordList: [] as any[],
   recordPage: 1,
-  recordTotalPage: 1,
+  recordPageSize: 20,
+  recordTotal: 0,
   dialog: {
     visible: false,
     mode: 'ban' as 'ban' | 'unban',
@@ -199,16 +218,20 @@ const state = reactive({
 
 const {
   memberId,
+  keyword,
+  statusFilter,
   statusLoading,
   statusInfo,
   bannedLoading,
   bannedList,
   bannedPage,
-  bannedTotalPage,
+  bannedPageSize,
+  bannedTotal,
   recordLoading,
   recordList,
   recordPage,
-  recordTotalPage,
+  recordPageSize,
+  recordTotal,
   dialog,
 } = toRefs(state)
 
@@ -218,12 +241,16 @@ const actionText = (action: number) => {
   if (action === 1) return '封禁'
   if (action === 2) return '解封'
   if (action === 3) return '修改时长'
+  if (action === 4) return '添加风险'
+  if (action === 5) return '解除风险'
   return '未知'
 }
 
 const actionTagType = (action: number) => {
   if (action === 1) return 'danger'
   if (action === 2) return 'success'
+  if (action === 4) return 'warning'
+  if (action === 5) return 'info'
   return 'warning'
 }
 
@@ -245,12 +272,10 @@ const checkStatus = async (targetMemberId?: number | Event) => {
   }
   state.statusLoading = true
   try {
-    const data = await checkFreebieUserBan({
-      memberId: memberValue,
-    })
+    const data = await checkFreebieUserBan({ memberId: memberValue })
     state.statusInfo = {
       memberId: memberValue,
-      isBanned: typeof data.banned === 'boolean' ? data.banned : !!data.isBanned,
+      isBanned: typeof data.isBanned === 'boolean' ? data.isBanned : !!data.banned,
       banExpireTime: data.banExpireTime,
       reason: data.reason,
     }
@@ -265,11 +290,16 @@ const loadBannedList = async () => {
   try {
     const data = await getBannedFreebieUsers({
       page: state.bannedPage,
-      size: 20,
+      size: state.bannedPageSize,
       memberId: currentMemberId.value,
+      keyword: state.keyword,
+      status: state.statusFilter,
     })
     state.bannedList = data.list || []
-    state.bannedTotalPage = data.pages || 1
+    state.bannedTotal = data.total || (data.pages || 0) * state.bannedPageSize
+    if (!state.bannedTotal && state.bannedPage === 1 && state.bannedList.length < state.bannedPageSize) {
+      state.bannedTotal = state.bannedList.length
+    }
   } finally {
     state.bannedLoading = false
   }
@@ -280,14 +310,27 @@ const loadRecordList = async () => {
   try {
     const data = await getFreebieUserBanRecords({
       page: state.recordPage,
-      size: 20,
+      size: state.recordPageSize,
       memberId: currentMemberId.value,
     })
     state.recordList = data.list || []
-    state.recordTotalPage = data.pages || 1
+    state.recordTotal = data.total || (data.pages || 0) * state.recordPageSize
+    if (!state.recordTotal && state.recordPage === 1 && state.recordList.length < state.recordPageSize) {
+      state.recordTotal = state.recordList.length
+    }
   } finally {
     state.recordLoading = false
   }
+}
+
+const onBannedSizeChange = () => {
+  state.bannedPage = 1
+  loadBannedList()
+}
+
+const onRecordSizeChange = () => {
+  state.recordPage = 1
+  loadRecordList()
 }
 
 const focusRecords = async (targetMemberId: number) => {
@@ -350,6 +393,8 @@ const submitAction = async () => {
 
 const resetAll = () => {
   state.memberId = ''
+  state.keyword = ''
+  state.statusFilter = undefined
   state.statusInfo = null
   state.bannedPage = 1
   state.recordPage = 1
@@ -364,11 +409,46 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.page-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border: 1px solid #f2d6d6;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff7f7 0%, #fffdf7 100%);
+}
+
+.page-intro__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2d3d;
+}
+
+.page-intro__desc {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #667085;
+}
+
+.query :deep(.el-form-item) {
+  margin-right: 12px;
+  margin-bottom: 12px;
+}
+
 .section-title {
   margin: 24px 0 12px;
   font-size: 16px;
   font-weight: 600;
   color: #303133;
+}
+
+.page-bottom {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
 }
 
 .avatar {
@@ -380,5 +460,9 @@ onMounted(() => {
 
 .w100 {
   width: 100%;
+}
+
+.w160 {
+  width: 160px;
 }
 </style>

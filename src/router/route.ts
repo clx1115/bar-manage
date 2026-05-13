@@ -467,7 +467,7 @@ export const dynamicRoutes : Array<RouteRecordRaw> = [
 					icon: 'ele-Present',
 				},
 				children: [
-  					{
+					{
 						path: '/freebie/gift',
 						name: 'freebieGift',
 						component: () => import('@/views/freebie/gift/index.vue'),
@@ -480,6 +480,21 @@ export const dynamicRoutes : Array<RouteRecordRaw> = [
 							isIframe: false,
 							roles: ['admin', 'director'],
 							icon: 'ele-Present',
+						},
+					},
+					{
+						path: '/freebie/gameProp',
+						name: 'gamePropIndex',
+						component: () => import('@/views/gameProp/index.vue'),
+						meta: {
+							title: '游戏道具',
+							isLink: '',
+							isHide: false,
+							isKeepAlive: true,
+							isAffix: false,
+							isIframe: false,
+							roles: ['admin', 'director'],
+							icon: 'ele-MagicStick',
 						},
 					},
 					{

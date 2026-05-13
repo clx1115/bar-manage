@@ -1,7 +1,13 @@
 <template>
   <div class="page-container layout-padding">
     <el-card shadow="hover" class="layout-padding-auto">
-      <div class="section-title">团长申请审核</div>
+      <div class="page-intro">
+        <div>
+          <div class="page-intro__title">团长申请审核</div>
+          <div class="page-intro__desc">查看团长申请信息、审核状态和申请原因，支持快速通过或驳回。</div>
+        </div>
+      </div>
+
       <el-table :data="list" v-loading="loading" style="width: 100%">
         <el-table-column prop="id" label="申请ID" width="100" />
         <el-table-column prop="userId" label="用户ID" width="100" />
@@ -19,29 +25,27 @@
             {{ formatDate(row.applyTime, 'YYYY-mm-dd HH:MM:SS') }}
           </template>
         </el-table-column>
-        <el-table-column prop="applyReason" label="申请原因" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="applyReason" label="申请原因" min-width="220" show-overflow-tooltip />
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
-            <el-button
-              v-if="row.status === 0"
-              size="small"
-              text
-              type="primary"
-              @click="openAuditDialog(row)"
-            >
+            <el-button v-if="row.status === 0" size="small" text type="primary" @click="openAuditDialog(row)">
               审核
             </el-button>
             <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
+
       <div class="page-bottom">
         <el-pagination
           v-model:currentPage="currentPage"
+          v-model:page-size="pageSize"
           background
-          layout="prev, pager, next, jumper"
-          :page-count="totalPage"
+          layout="total, sizes, prev, pager, next, jumper"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
           @current-change="getListData"
+          @size-change="onSizeChange"
         />
       </div>
     </el-card>
@@ -55,19 +59,12 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="审核备注">
-          <el-input
-            v-model="dialog.form.auditRemark"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入审核备注"
-          />
+          <el-input v-model="dialog.form.auditRemark" type="textarea" :rows="4" placeholder="请输入审核备注" />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialog.visible = false">取消</el-button>
-        <el-button type="primary" @click="submitAudit" :loading="dialog.loading">
-          确认
-        </el-button>
+        <el-button type="primary" :loading="dialog.loading" @click="submitAudit">确认</el-button>
       </template>
     </el-dialog>
   </div>
@@ -83,7 +80,8 @@ const state = reactive({
   list: [] as any[],
   loading: false,
   currentPage: 1,
-  totalPage: 1,
+  pageSize: 20,
+  total: 0,
   dialog: {
     visible: false,
     loading: false,
@@ -95,7 +93,7 @@ const state = reactive({
   },
 })
 
-const { list, loading, currentPage, totalPage, dialog } = toRefs(state)
+const { list, loading, currentPage, pageSize, total, dialog } = toRefs(state)
 
 const statusText = (status: number) => {
   if (status === 0) return '待审核'
@@ -117,13 +115,21 @@ const getListData = async () => {
   try {
     const data = await getCaptainAuditList({
       page: state.currentPage,
-      size: 20,
+      size: state.pageSize,
     })
     state.list = data.list || []
-    state.totalPage = data.pages || 1
+    state.total = data.total || (data.pages || 0) * state.pageSize
+    if (!state.total && state.currentPage === 1 && state.list.length < state.pageSize) {
+      state.total = state.list.length
+    }
   } finally {
     state.loading = false
   }
+}
+
+const onSizeChange = () => {
+  state.currentPage = 1
+  getListData()
 }
 
 const openAuditDialog = (row: any) => {
@@ -160,10 +166,33 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.section-title {
-  margin-bottom: 16px;
-  font-size: 18px;
+.page-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border: 1px solid #e7eef7;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8fbff 0%, #fff8ef 100%);
+}
+
+.page-intro__title {
+  font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: #1f2d3d;
+}
+
+.page-intro__desc {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #667085;
+}
+
+.page-bottom {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
 }
 </style>
