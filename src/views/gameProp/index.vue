@@ -27,8 +27,8 @@
         </el-form-item>
         <el-form-item>
           <el-select v-model="query.payType" placeholder="支付方式" clearable class="w160">
-            <el-option label="豪气值" :value="10" />
-            <el-option label="微信" :value="20" />
+            <el-option label="微信支付" :value="10" />
+            <el-option label="豪气值支付" :value="30" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -140,8 +140,8 @@
           <el-col :span="12">
             <el-form-item label="支付方式" prop="payType">
               <el-select v-model="formData.payType" class="w100">
-                <el-option label="豪气值" :value="10" />
-                <el-option label="微信" :value="20" />
+                <el-option label="微信支付" :value="10" />
+                <el-option label="豪气值支付" :value="30" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -327,7 +327,7 @@ const listQueryData = computed(() => {
   return queryData
 })
 
-const payTypeText = (value: number) => ({ 10: '豪气值', 20: '微信' }[value] || '-')
+const payTypeText = (value: number) => ({ 10: '微信支付', 30: '豪气值支付' }[value] || '-')
 const statusText = (value: number) => ({ 1: '上架', 2: '下架' }[value] || '-')
 const formatPrice = (value?: number) => (typeof value === 'number' ? `¥${value.toFixed(2)}` : '-')
 const formatCentAmount = (value?: number) => `¥${(((value || 0) as number) / 100).toFixed(2)}`
