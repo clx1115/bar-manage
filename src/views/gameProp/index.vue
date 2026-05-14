@@ -4,13 +4,20 @@
       <div class="page-intro">
         <div>
           <div class="page-intro__title">游戏道具管理</div>
-          <div class="page-intro__desc">维护游戏道具、关联商品和效果配置，支持快速新增、编辑、删除和销售统计。</div>
+          <div class="page-intro__desc">
+            维护游戏道具、关联商品和效果配置，支持快速新增、编辑、删除和销售统计。
+          </div>
         </div>
       </div>
 
       <el-form class="query" :inline="true">
         <el-form-item>
-          <el-input v-model="query.keyword" placeholder="搜索商品名称或效果名称" clearable @keyup.enter="getListData" />
+          <el-input
+            v-model="query.keyword"
+            placeholder="搜索商品名称或效果名称"
+            clearable
+            @keyup.enter="getListData"
+          />
         </el-form-item>
         <el-form-item>
           <el-select v-model="query.status" placeholder="状态" clearable class="w160">
@@ -114,8 +121,19 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="效果配置" prop="effectId">
-              <el-select v-model="formData.effectId" filterable class="w100" placeholder="请选择效果配置" @change="onEffectChange">
-                <el-option v-for="item in effectOptions" :key="item.id" :label="`${item.effectName} (${item.effectCode})`" :value="item.id" />
+              <el-select
+                v-model="formData.effectId"
+                filterable
+                class="w100"
+                placeholder="请选择效果配置"
+                @change="onEffectChange"
+              >
+                <el-option
+                  v-for="item in effectOptions"
+                  :key="item.id"
+                  :label="`${item.effectName} (${item.effectCode})`"
+                  :value="item.id"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -251,7 +269,7 @@ const state = reactive({
     payType: undefined as number | undefined,
   },
   dialogVisible: false,
-  dialogType: 'add',
+  dialogType: 'add' as 'add' | 'edit',
   submitLoading: false,
   formData: createDefaultForm(),
   effectOptions: [] as any[],
@@ -299,7 +317,7 @@ const {
 } = toRefs(state)
 
 const listQueryData = computed(() => {
-  const queryData: any = {
+  const queryData: Record<string, any> = {
     page: state.currentPage,
     size: state.pageSize,
   }
@@ -371,12 +389,12 @@ const onEffectChange = () => {
   formRef.value?.validateField('effectId')
 }
 
-const openDialog = async (type: string, row?: any) => {
+const openDialog = async (type: 'add' | 'edit', row?: any) => {
   state.dialogType = type
   state.dialogVisible = true
   state.formData = createDefaultForm()
-  formRef.value?.clearValidate()
   await loadEffects()
+  formRef.value?.clearValidate()
   if (type === 'edit' && row?.id) {
     const data = await getGamePropDetail(row.id)
     state.formData = {
